@@ -30,8 +30,8 @@
 │   ├── parser.ts <br>
 │   ├── renderer <br>
 │   │   └── htmlRender.ts <br>
-│   ├── state.ts <br>
-│   └── types <br>
+│   ├── state.ts # 解析器上下文<br>
+│   └── types # 接口定义<br>
 │       ├── parser.interface.ts <br>
 │       ├── renderer.interface.ts <br>
 │       └── token.interface.ts <br>
