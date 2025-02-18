@@ -24,8 +24,8 @@ export class MarkdownParser {
         this.debug = options.debug || false;
 
         // 注册规则
-        this.blockParser.registerRule(new ParagraphRule());
         this.blockParser.registerRule(new EmptyLineRule());
+        this.blockParser.registerRule(new ParagraphRule());
     }
 
     parse(markdown: string): Token[] {

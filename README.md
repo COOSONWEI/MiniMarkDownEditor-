@@ -56,3 +56,5 @@
 └── utils # 通用工具函数<br>
     ├── cache.ts <br>
     └── regex.ts # 正则表达式预编译<br>
+- 2025-02-18 <br>
+  @author COOSONWEI 实现基础解析流程与段落/空行处理（p 标签实现）;
