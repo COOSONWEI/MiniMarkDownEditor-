@@ -5,6 +5,8 @@ import { Token } from '../tokens/token';
 import { BlockParser } from '../parser/block/state';
 import { ParagraphRule } from '../parser/block/rules/paragraph';
 import { EmptyLineRule } from '../parser/block/rules/empty';
+import { HeadingRule } from '../parser/block/rules/heading';
+import { ListRule } from '../parser/block/rules/list';
 
 /**
  * 解析器基础类
@@ -22,9 +24,10 @@ export class MarkdownParser {
 
     constructor(options: { debug?: boolean } = {}) {
         this.debug = options.debug || false;
-
-        // 注册规则
+         // 注册规则
         this.blockParser.registerRule(new EmptyLineRule());
+        this.blockParser.registerRule(new HeadingRule()); 
+        this.blockParser.registerRule(new ListRule());
         this.blockParser.registerRule(new ParagraphRule());
     }
 
@@ -54,6 +57,6 @@ export class MarkdownParser {
             });
         }
 
-        return this.blockParser.parseLine(line, this.context);
+        return tokens;
     }
 }

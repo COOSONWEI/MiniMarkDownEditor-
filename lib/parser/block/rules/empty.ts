@@ -1,3 +1,4 @@
+import { ParsingContext } from "../../../core/state";
 import { Token } from "../../../tokens/token";
 import { BlockRule } from "../state";
 
@@ -7,13 +8,12 @@ import { BlockRule } from "../state";
  * @author COOSONWEI
  */
 export class EmptyLineRule implements BlockRule {
-    priority = 100; // 高优先级
+    priority = 50; // 高优先级
   
-    match(line: string): boolean {
+    match(line: string, ctx: ParsingContext): boolean {
       return line.trim().length === 0;
     }
-  
-    execute(): Token[] {
+    execute(line: string, ctx: ParsingContext): Token[] {
       return []; // 忽略空行
     }
   }

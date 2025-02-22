@@ -27,8 +27,8 @@
 - 2025-02-17 <br>
   @author COOSONWEI 完成了项目基础的架构划分具体如下：<br>
 ├── core # 核心系统入口和基础类型定义 <br>
-│   ├── parser.ts <br>
-│   ├── renderer <br>
+│   ├── parser.ts # 解析器集成<br>
+│   ├── renderer # 渲染器功能实现 <br>
 │   │   └── htmlRender.ts <br>
 │   ├── state.ts # 解析器上下文<br>
 │   └── types # 接口定义<br>

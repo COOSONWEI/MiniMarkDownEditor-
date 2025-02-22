@@ -6,9 +6,18 @@
  * @author COOSONWEI
  */
 export enum TokenType {
-    paragraph_open = "paragraph_open",
-    paragraph_close = "paragraph_close",
-    text = "text"
+    paragraph_open = "paragraph_open", // 段落开始
+    paragraph_close = "paragraph_close", // 段落结束
+    text = "text", // 文本
+    inline = "inline", // 行内标记
+    heading_open = "heading_open", // 标题开始
+    heading_close = "heading_close", // 标题结束
+    list_open = "list_open", // 列表开始
+    list_close = "list_close", // 列表结束
+    list_item_open = "list_item_open", // 列表项开始
+    list_item_close = "list_item_close", // 列表项结束
+    code_open = "code_open", // 代码块开始
+    code_close = "code_close", // 代码块结束
 }
 
 /**
@@ -18,7 +27,7 @@ export enum TokenType {
  */
 export class Token {
     type: string;  // 类型
-    tag?: string = ''; // html标签
+    tag?: string = ""; // html标签
     attrs?: Record<string, string>; // 标记的属性  [key, value]
     level: number = 0; // 层级(用于缩进处理)
     map?: [number, number]; // 对应的位置 [start, end]
