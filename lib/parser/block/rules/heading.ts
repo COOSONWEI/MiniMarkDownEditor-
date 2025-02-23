@@ -10,7 +10,7 @@ import { BaseBlockRule } from "./base";
 
 export class HeadingRule extends BaseBlockRule {
 
-    private static regex = /^(#{1,6})\s+(.*)$/; // 正则表达式
+    private static regex = /^(#{1,6})(?=\s)(.*)/; // 正则表达式
 
     constructor() {
         super(15); // 优先级高于段落

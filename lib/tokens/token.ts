@@ -6,18 +6,18 @@
  * @author COOSONWEI
  */
 export enum TokenType {
-    paragraph_open = "paragraph_open", // 段落开始
-    paragraph_close = "paragraph_close", // 段落结束
-    text = "text", // 文本
-    inline = "inline", // 行内标记
-    heading_open = "heading_open", // 标题开始
-    heading_close = "heading_close", // 标题结束
-    list_open = "list_open", // 列表开始
-    list_close = "list_close", // 列表结束
-    list_item_open = "list_item_open", // 列表项开始
-    list_item_close = "list_item_close", // 列表项结束
-    code_open = "code_open", // 代码块开始
-    code_close = "code_close", // 代码块结束
+    PARAGRAPH_OPEN = "paragraph_open", // 段落开始
+    PARAGRAPH_CLOSE = "paragraph_close", // 段落结束
+    TEXT = "text", // 文本
+    INLINE = "inline", // 行内标记
+    HEADING_OPEN = "heading_open", // 标题开始
+    HEADING_CLOSE = "heading_close", // 标题结束
+    LIST_OPEN = "list_open", // 列表开始
+    LIST_CLOSE = "list_close", // 列表结束
+    LIST_ITEM_OPEN = "list_item_open", // 列表项开始
+    LIST_ITEM_CLOSE = "list_item_close", // 列表项结束
+    COSE_OPEN = "code_open", // 代码块开始
+    CODE_CLOSE = "code_close", // 代码块结束
 }
 
 /**

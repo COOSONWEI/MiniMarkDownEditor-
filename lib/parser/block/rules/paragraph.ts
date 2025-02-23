@@ -24,9 +24,9 @@ export class ParagraphRule implements BlockRule {
     }
 
     return [
-        new Token({ type: TokenType.paragraph_open, tag: 'p', nesting: 1, block: true }),
-        new Token({ type: TokenType.text, content: line.trim() }),
-        new Token({ type: TokenType.paragraph_close, tag: 'p', nesting: -1, block: true })
+        new Token({ type: TokenType.PARAGRAPH_OPEN, tag: 'p', nesting: 1, block: true }),
+        new Token({ type: TokenType.TEXT, content: line.trim() }),
+        new Token({ type: TokenType.PARAGRAPH_CLOSE, tag: 'p', nesting: -1, block: true })
       ] ;
   }
 }

@@ -6,9 +6,9 @@
  * @author COOSONWEI
  */
 export enum TokenType {
-  paragraph_open = "paragraph_open",
-  paragraph_close = "paragraph_close",
-  text = "text"
+  PARAGRAPH_OPEN = "PARAGRAPH_OPEN",
+  PARAGRAPH_CLOSE = "PARAGRAPH_CLOSE",
+  TEXT = "TEXT"
 }
 
 /**
@@ -23,7 +23,7 @@ export class Token {
   level: number = 0; // 层级(用于缩进处理)
   map?: [number, number]; // 对应的位置 [start, end]
   nesting: 1 | 0 | -1 = 0; // 嵌套深度（标签的开始和结束） 1: 新的嵌套层级 0: 该 tag 不影响整体的嵌套层级 -1: 结束一个嵌套层级
-  content?: string; // 内容 text
+  content?: string; // 内容 TEXT
   children: Token[] = []; // 子节点
   markup?: string; // markdown 语法标记
   info?: string; // tag 的额外信息 
@@ -73,13 +73,13 @@ function renderTokensToHTML(tokens: Token[]): string {
   let html = '';
   for (const token of tokens) {
       switch (token.type) {
-          case TokenType.paragraph_open:
+          case TokenType.PARAGRAPH_OPEN:
               html += renderOpeningTag(token);
               break;
-          case TokenType.text:
+          case TokenType.TEXT:
               html += token.content || '';
               break;
-          case TokenType.paragraph_close:
+          case TokenType.PARAGRAPH_CLOSE:
               html += renderClosingTag(token);
               break;
           default:
@@ -113,12 +113,12 @@ function renderClosingTag(token: Token): string {
 
 // 示例使用
 const sampleTokens: Token[] = [
-  new Token({ type: TokenType.paragraph_open, tag: 'p' }),
-  new Token({ type: TokenType.text, content: 'Hello World' }),
-  new Token({ type: TokenType.paragraph_close, tag: 'p' }),
-  new Token({ type: TokenType.paragraph_open, tag: 'p' }),
-  new Token({ type: TokenType.text, content: 'This is a paragraph' }),
-  new Token({ type: TokenType.paragraph_close, tag: 'p' })
+  new Token({ type: TokenType.PARAGRAPH_OPEN, tag: 'p' }),
+  new Token({ type: TokenType.TEXT, content: 'Hello World' }),
+  new Token({ type: TokenType.PARAGRAPH_CLOSE, tag: 'p' }),
+  new Token({ type: TokenType.PARAGRAPH_OPEN, tag: 'p' }),
+  new Token({ type: TokenType.TEXT, content: 'This is a paragraph' }),
+  new Token({ type: TokenType.PARAGRAPH_CLOSE, tag: 'p' })
 ];
 
 const htmlOutput = renderTokensToHTML(sampleTokens);

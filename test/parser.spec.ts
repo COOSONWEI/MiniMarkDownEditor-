@@ -20,12 +20,12 @@ describe('MarkdownParser', () => {
     const tokens = parser.parse(input);
     // console.log('p token is',tokens);
     expect(tokens).toEqual([
-      new Token({ type: TokenType.paragraph_open, tag: 'p', nesting: 1, block: true }),
-      new Token({ type: TokenType.text, content: 'Hello World' }),
-      new Token({ type: TokenType.paragraph_close, tag: 'p', nesting: -1, block: true  }),
-      new Token({ type: TokenType.paragraph_open, tag: 'p', nesting: 1, block: true  }),
-      new Token({ type: TokenType.text, content: 'This is a paragraph' }),
-      new Token({ type: TokenType.paragraph_close, tag: 'p', nesting: -1, block: true })
+      new Token({ type: TokenType.PARAGRAPH_OPEN, tag: 'p', nesting: 1, block: true }),
+      new Token({ type: TokenType.TEXT, content: 'Hello World' }),
+      new Token({ type: TokenType.PARAGRAPH_CLOSE, tag: 'p', nesting: -1, block: true  }),
+      new Token({ type: TokenType.PARAGRAPH_OPEN, tag: 'p', nesting: 1, block: true  }),
+      new Token({ type: TokenType.TEXT, content: 'This is a paragraph' }),
+      new Token({ type: TokenType.PARAGRAPH_CLOSE, tag: 'p', nesting: -1, block: true })
     ]);
   });
 
@@ -39,7 +39,7 @@ describe('MarkdownParser', () => {
     
     // 检查是否包含标题标记
     expect(tokens).toContainEqual(
-      new Token({ type: TokenType.heading_open, tag: 'h1', nesting: 1, block: true }),
+      new Token({ type: TokenType.HEADING_OPEN, tag: 'h1', nesting: 1, block: true }),
     );
   })
 
@@ -49,6 +49,7 @@ describe('MarkdownParser', () => {
     const tokens = parser.parse(input);
     console.log('list tokens is',tokens);
 
+    
   })
 
 });

@@ -15,6 +15,6 @@ export abstract class BaseBlockRule extends BlockRule {
     // 内联解析
     protected parseInlineContent(text: string): Token[] {
         // TODO: 后续需要改为独立的内联解析器
-      return [new Token({ type: TokenType.inline, content: text, children: [new Token({type: TokenType.text, content: text})]})];
+      return [new Token({ type: TokenType.INLINE, content: text, children: [new Token({type: TokenType.TEXT, content: text})]})];
     }
   }
