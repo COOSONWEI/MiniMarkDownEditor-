@@ -7,6 +7,7 @@ import { ParagraphRule } from '../parser/block/rules/paragraph';
 import { EmptyLineRule } from '../parser/block/rules/empty';
 import { HeadingRule } from '../parser/block/rules/heading';
 import { ListRule } from '../parser/block/rules/list';
+import { BlockQuoteRule } from '../parser/block/rules/quote';
 
 /**
  * 解析器基础类
@@ -28,6 +29,7 @@ export class MarkdownParser {
         this.blockParser.registerRule(new EmptyLineRule());
         this.blockParser.registerRule(new HeadingRule()); 
         this.blockParser.registerRule(new ListRule());
+        this.blockParser.registerRule(new BlockQuoteRule());
         this.blockParser.registerRule(new ParagraphRule());
     }
 

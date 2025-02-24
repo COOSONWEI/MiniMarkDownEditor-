@@ -12,7 +12,7 @@ import { BaseBlockRule } from "./base";
 export class ListRule extends BaseBlockRule {
     private unorderedRegex = /^([ \t]*)([-\*\+])\s+(.*)/;
     private orderedRegex = /^([ \t]*)(\d+)\.\s+(.*)/;
-    private static regex = /^[\-\*\+]\s+(.*)/; // 正则表达式
+    
 
     constructor() {
         super(14); // p<list<h

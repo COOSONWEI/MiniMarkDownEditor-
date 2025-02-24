@@ -49,7 +49,14 @@ describe('MarkdownParser', () => {
     const tokens = parser.parse(input);
     console.log('list tokens is',tokens);
 
-    
+
+  })
+
+  // 引用测试
+  test('解析引用', () => {
+    const input = readMdFile('quote.md');
+    const tokens = parser.parse(input);
+    console.log('quote tokens is',tokens);
   })
 
 });

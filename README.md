@@ -24,7 +24,7 @@
 - [ ] 引入状态机模型进行状态处理
 
 ## 更新日志
-- 2025-02-17 <br>
+#### 2025-02-17 <br>
   @author COOSONWEI 完成了项目基础的架构划分具体如下：<br>
 ├── core # 核心系统入口和基础类型定义 <br>
 │   ├── parser.ts # 解析器集成<br>
@@ -56,7 +56,11 @@
 └── utils # 通用工具函数<br>
     ├── cache.ts <br>
     └── regex.ts # 正则表达式预编译<br>
-- 2025-02-18 <br>
+#### 2025-02-18 <br>
   @author COOSONWEI 实现基础解析流程与段落/空行处理（p 标签实现）;
-- 2025-02-22 <br>
+#### 2025-02-22 <br>
   @author COOSONWEI 实现 h 标签解析;
+#### 2025-02-23 <br>
+  @author COOSONWEI 实现 list 标签解析（ul 、 ol ）;
+#### 2025-02-24 <br>
+  @author COOSONWEI 实现  引用 标签解析（ul 、 ol ）;

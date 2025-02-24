@@ -18,6 +18,25 @@ export enum TokenType {
     LIST_ITEM_CLOSE = "list_item_close", // 列表项结束
     COSE_OPEN = "code_open", // 代码块开始
     CODE_CLOSE = "code_close", // 代码块结束
+    BLOCKQUOTE_OPEN = "blockquote_open", // 引用块开始
+    BLOCKQUOTE_CLOSE = "blockquote_close", // 引用块结束
+    TABLE_OPEN = "table_open", // 表格开始
+    TABLE_CLOSE = "table_close", // 表格结束
+    TABLE_HEADER_OPEN = "table_header_open", // 表格表头开始
+    TABLE_HEADER_CLOSE = "table_header_close", // 表格表头结束
+    TABLE_BODY_OPEN = "table_body_open", // 表格体开始
+    TABLE_BODY_CLOSE = "table_body_close", // 表格体结束
+    TABLE_ROW_OPEN = "table_row_open", // 表格行开始
+    TABLE_ROW_CLOSE = "table_row_close", // 表格行结束
+    TABLE_CELL_OPEN = "table_cell_open", // 表格单元格开始
+    TABLE_CELL_CLOSE = "table_cell_close", // 表格单元格结束
+    HR_OPEN = "hr_open", // 水平线开始
+    HR_CLOSE = "hr_close", // 水平线结束
+    IMAGE_OPEN = "image_open", // 图片开始
+    IMAGE_CLOSE = "image_close", // 图片结束
+    LINK_OPEN = "link_open", // 链接开始
+    LINK_CLOSE = "link_close", // 链接结束
+    
 }
 
 /**

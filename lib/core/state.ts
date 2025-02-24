@@ -6,14 +6,19 @@ export class ParsingContext {
       listActive: boolean; // 列表状态
       inParagraph: boolean; // 段落状态
       headingActive: boolean; // 标题状态
-      listLevelStack: number[]; // 列表层级栈（后续可能考虑抽离为单独的管理类）
+      inBlockquote: boolean; // 引用状态
+      // TODO: 后续可能考虑抽离为单独的层级管理
+      listLevelStack: number[]; // 列表层级栈
+      quoteLevelStack: number[]; // 引用层级栈
   }> = [
       {
           state: 'root',
           listActive: false,
           inParagraph: false,
+          inBlockquote: false,
           headingActive: false,
-          listLevelStack: []
+          listLevelStack: [],
+          quoteLevelStack: []
       }
   ];
 
@@ -41,6 +46,10 @@ export class ParsingContext {
   get currentListLevel() {
       return this.currentState.listLevelStack.length;
   }
+  // 获取当前引用层级
+  get currentQuoteLevel() {
+      return this.currentState.quoteLevelStack.length;
+  }
 
   // 状态栈管理方法
   pushState(state: string) {
@@ -48,8 +57,10 @@ export class ParsingContext {
           state,
           listActive: this.currentState.listActive,
           inParagraph: this.currentState.inParagraph,
+          inBlockquote: this.currentState.inBlockquote,
           headingActive: this.currentState.headingActive,
-          listLevelStack: [...this.currentState.listLevelStack] // 复制列表层级栈
+          listLevelStack: [...this.currentState.listLevelStack], // 复制列表层级栈
+          quoteLevelStack: [...this.currentState.quoteLevelStack] // 复制引用层级栈
       });
   }
 
@@ -90,5 +101,16 @@ export class ParsingContext {
   // 获取当前列表层级的缩进
   getCurrentListIndent() {
       return this.currentState.listLevelStack[this.currentState.listLevelStack.length - 1];
+  }
+
+  // 进入新的引用层级
+  enterQuoteLevel() {
+      this.currentState.quoteLevelStack.push(1);
+  }
+  // 离开当前引用层级
+  leaveQuoteLevel() {
+      if (this.currentState.quoteLevelStack.length > 0) {
+          this.currentState.quoteLevelStack.pop();
+      }
   }
 }
