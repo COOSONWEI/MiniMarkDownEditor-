@@ -8,6 +8,7 @@ import { EmptyLineRule } from '../parser/block/rules/empty';
 import { HeadingRule } from '../parser/block/rules/heading';
 import { ListRule } from '../parser/block/rules/list';
 import { BlockQuoteRule } from '../parser/block/rules/quote';
+import { HorizontalRule } from '../parser/block/rules/horizontal';
 
 /**
  * 解析器基础类
@@ -30,6 +31,7 @@ export class MarkdownParser {
         this.blockParser.registerRule(new HeadingRule()); 
         this.blockParser.registerRule(new ListRule());
         this.blockParser.registerRule(new BlockQuoteRule());
+        this.blockParser.registerRule(new HorizontalRule());
         this.blockParser.registerRule(new ParagraphRule());
     }
 
@@ -46,6 +48,7 @@ export class MarkdownParser {
         return tokens;
     }
 
+    // 解析行
     private parseLine(line: string): Token[] {
 
         const tokens = this.blockParser.parseLine(line, this.context);
