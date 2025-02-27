@@ -9,6 +9,7 @@ import { HeadingRule } from '../parser/block/rules/heading';
 import { ListRule } from '../parser/block/rules/list';
 import { BlockQuoteRule } from '../parser/block/rules/quote';
 import { HorizontalRule } from '../parser/block/rules/horizontal';
+import { TableRule } from '../parser/block/rules/table';
 
 /**
  * 解析器基础类
@@ -32,6 +33,7 @@ export class MarkdownParser {
         this.blockParser.registerRule(new ListRule());
         this.blockParser.registerRule(new BlockQuoteRule());
         this.blockParser.registerRule(new HorizontalRule());
+        this.blockParser.registerRule(new TableRule());
         this.blockParser.registerRule(new ParagraphRule());
     }
 

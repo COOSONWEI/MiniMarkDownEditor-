@@ -14,6 +14,10 @@ export class EmptyLineRule implements BlockRule {
       return line.trim().length === 0;
     }
     execute(line: string, ctx: ParsingContext): Token[] {
-      return []; // 忽略空行
+      // 重置相关状态
+      ctx.setInParagraph(false);
+      ctx.setListActive(false);
+      ctx.setHeadingActive(false);
+      return []; // 空行不生成 token
     }
   }
