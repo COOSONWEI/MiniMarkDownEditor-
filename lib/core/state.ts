@@ -1,6 +1,4 @@
 
-
-
 export class ParsingContext {
   public currentLine = 0;
   public indentLevel = 0;
@@ -51,6 +49,11 @@ export class ParsingContext {
   // 标题状态
   get isHeadingActive() {
       return this.currentState.headingActive;
+  }
+
+  // 引用状态
+  get isInBlockquote() {
+      return this.currentState.inBlockquote;
   }
 
   // 表格状态
@@ -210,5 +213,13 @@ export class ParsingContext {
 
   getCurrentLineIndex(): number {
       return this.currentLine;
+  }
+
+  // 重置状态
+  reset() {
+    this.setInParagraph(false);
+    this.setListActive(false);
+    this.setHeadingActive(false);
+    // 可扩展其他需要重置的状态
   }
 }

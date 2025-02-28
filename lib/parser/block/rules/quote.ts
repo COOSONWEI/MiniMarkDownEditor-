@@ -1,3 +1,4 @@
+import { RULE_PRIORITIES } from "../../../command/priority";
 import { ParsingContext } from "../../../core/state";
 import { Token, TokenType } from "../../../tokens/token";
 import { BaseBlockRule } from "./base";
@@ -11,7 +12,7 @@ export class BlockQuoteRule extends BaseBlockRule {
     private static regex = /^(\>+)\s*(.*)/; // 正则表达式
 
     constructor() {
-        super(12); // p < 优先级 < list
+        super(RULE_PRIORITIES.BLOCKQUOTE); // p < 优先级 < list
     }
 
     match(line: string, ctx: ParsingContext): boolean {

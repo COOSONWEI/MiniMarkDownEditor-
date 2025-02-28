@@ -1,26 +1,21 @@
-
 /**
  * 表格规则
  * @author COOSONWEI
- * 
  */
-
-
-
+import { RULE_PRIORITIES } from "../../../command/priority";
 import { ParsingContext } from "../../../core/state";
 import { Token, TokenType } from "../../../tokens/token";
 import { BaseBlockRule } from "./base";
 
 export class TableRule extends BaseBlockRule {
     static readonly RULE_NAME = 'TableRule';
-    
 
     private TABLE_REGEX = /^\s*\|(.+)\|\s*$/;
     private TABLE_ALIGN_REGEX = /^:?-{3,}:?$/;
     private TABLE_DATA_REGEX = /^\s*\|(?:\s*[^|]+?)+\|\s*$/;
 
     constructor() {
-        super(13); // 调整优先级，确保在列表和引用之后处理
+        super(RULE_PRIORITIES.TABLE); // 调整优先级，确保在列表和引用之后处理
     }
 
     match(line: string, ctx: ParsingContext): boolean {
@@ -129,14 +124,13 @@ export class TableRule extends BaseBlockRule {
                     block: true,
                 }));
 
-                // 预处理后续数据行
+                // 处理后续数据行
                 for (let i = index + 2; i < lines.length; i++) {
                     const dataLine = lines[i];
                     if (!this.TABLE_DATA_REGEX.test(dataLine)) {
                         break;
                     }
                     this.processDataRow(dataLine, alignments, tokens);
-                    ctx.currentLine = i; // 更新当前行索引
                 }
 
                 // 关闭表格标签

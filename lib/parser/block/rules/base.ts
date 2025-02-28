@@ -7,6 +7,7 @@ import { Token } from "..";
 import { TokenType } from "../../../tokens/token";
 import { BlockRule } from "../state";
 
+
 export abstract class BaseBlockRule extends BlockRule {
     protected constructor(priority: number) {
       super({ priority });

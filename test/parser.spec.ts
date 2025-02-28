@@ -42,4 +42,24 @@ describe('MarkdownParser', () => {
     const tokens = parser.parse(mdContent);
     console.log('p tokens:', tokens);
   })
+
+  // 标题测试
+  test('标题解析', () => {
+    const mdContent = readMdFile('headings.md');
+    const tokens = parser.parse(mdContent);
+    // console.log('h tokens:', tokens);
+  })
+
+  // 列表测试
+  test('列表解析', () => {
+    const mdContent = readMdFile('list.md');
+    const tokens = parser.parse(mdContent);
+    // console.log('list tokens:', tokens);
+  })
+  // 表格测试
+  test('表格解析', () => {
+    const mdContent = readMdFile('table.md');
+    const tokens = parser.parse(mdContent);
+    console.log('table tokens:', tokens);
+  })
 });

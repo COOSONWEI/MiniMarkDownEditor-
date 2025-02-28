@@ -1,7 +1,7 @@
 // 解析器
 
 import { ParsingContext } from './state';
-import { Token } from '../tokens/token';
+import { Token, TokenType } from '../tokens/token';
 import { BlockParser } from '../parser/block/state';
 import { ParagraphRule } from '../parser/block/rules/paragraph';
 import { EmptyLineRule } from '../parser/block/rules/empty';
@@ -63,7 +63,44 @@ export class MarkdownParser {
               tokens
             });
         }
-
+        
         return tokens;
     }
+
+    //自动补全未闭合的段落
+    // private autoCloseOpenBlocks(tokens: Token[]): void {
+    //     const openBlocks = new Map<Token, number>(); // 通过栈结构记录层级
+      
+    //     for (const token of tokens) {
+    //       if (token.type === TokenType.PARAGRAPH_OPEN) {
+    //         openBlocks.push(token);
+    //       } else if (token.type === TokenType.PARAGRAPH_CLOSE) {
+    //         if (openBlocks.length === 0) {
+    //           console.warn(`Unexpected closing paragraph tag without matching open`);
+    //         } else {
+    //           openBlocks.pop();
+    //         }
+    //       }
+    //     }
+      
+    //     // 补全剩余未闭合的块（按逆序闭合）
+    //     while (openBlocks.length > 0) {
+    //       const openToken = openBlocks.pop();
+    //       // 添加错误日志（可选）
+    //       console.warn(`Unclosed block detected:`, openToken);
+      
+    //       // 创建对应闭合标签
+    //       const closeToken: Token = new Token({
+    //         type: TokenType.PARAGRAPH_CLOSE,
+    //         tag: openToken.tag,
+    //         nesting: -1,
+    //         block: true,
+    //         // 可选：继承源位置的映射信息
+    //         map: openToken.map ?? [openToken.map![0], tokens.length],
+    //       });
+      
+    //       tokens.push(closeToken);
+    //     }
+    //   }
+      
 }

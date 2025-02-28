@@ -5,6 +5,7 @@
  */
 
 
+import { RULE_PRIORITIES } from "../../../command/priority";
 import { ParsingContext } from "../../../core/state";
 import { Token, TokenType } from "../../../tokens/token";
 import { BaseBlockRule } from "./base";
@@ -16,7 +17,7 @@ export class ListRule extends BaseBlockRule {
     private static MAX_NESTING_LEVEL = 5; // 最大嵌套层级
 
     constructor() {
-        super(14); // p<list<h
+        super(RULE_PRIORITIES.LIST); // p<list<h
     }
 
 
