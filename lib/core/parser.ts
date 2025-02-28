@@ -40,7 +40,7 @@ export class MarkdownParser {
     parse(markdown: string): Token[] {
         const lines = markdown.split('\n');
         const tokens: Token[] = [];
-
+        this.context.setLines(lines); // 添加 lines 到 context   
         for (this.context.currentLine = 0; this.context.currentLine < lines.length; this.context.currentLine++) {
             const line = lines[this.context.currentLine];
             tokens.push(...this.parseLine(line));

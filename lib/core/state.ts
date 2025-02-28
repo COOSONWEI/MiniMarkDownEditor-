@@ -1,4 +1,7 @@
 
+/**
+ * 上下文解析器
+ */
 export class ParsingContext {
   public currentLine = 0;
   public indentLevel = 0;

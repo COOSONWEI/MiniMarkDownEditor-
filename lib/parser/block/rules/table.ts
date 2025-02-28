@@ -10,220 +10,240 @@ import { BaseBlockRule } from "./base";
 export class TableRule extends BaseBlockRule {
     static readonly RULE_NAME = 'TableRule';
 
-    private TABLE_REGEX = /^\s*\|(.+)\|\s*$/;
+    private TABLE_REGEX = /^\s*\|\s*(\S+|\s+)\s*\|\s*(\S+|\s+)\s*\|\s*(\S+|\s+)\s*\|\s*$/;
     private TABLE_ALIGN_REGEX = /^:?-{3,}:?$/;
-    private TABLE_DATA_REGEX = /^\s*\|(?:\s*[^|]+?)+\|\s*$/;
+    private TABLE_DATA_REGEX = /^\s*\|\s*(?:[^|]+\s*)+\s*\|\s*$/;
 
     constructor() {
         super(RULE_PRIORITIES.TABLE); // 调整优先级，确保在列表和引用之后处理
     }
 
     match(line: string, ctx: ParsingContext): boolean {
-        const lines = ctx.getLines();
-        const index = ctx.getCurrentLineIndex();
-        const currentLine = line;
-        const nextLine = lines[index + 1];
+        // const lines = ctx.getLines();
+        // const index = ctx.getCurrentLineIndex();
+        // const currentLine = line;
+        const nextLine = ctx.getLines()[ctx.getCurrentLineIndex() + 1];
 
-        // 如果已经在表格状态中
         if (ctx.isInTable) {
-            // 检查是否为表格数据行，同时验证列数是否匹配
-            const isDataRow = this.TABLE_DATA_REGEX.test(currentLine);
-            if (isDataRow) {
-                const currentCells = this.escapedSplit(currentLine);
-                const headerCells = this.escapedSplit(ctx.getLines()[ctx.tableStartIndex || 0]);
-                return currentCells.length === headerCells.length;
-            }
-            // 如果不是有效的表格数据行，结束表格状态
-            ctx.setInTable(false);
-            return false;
+            return this.TABLE_DATA_REGEX.test(line);
         }
 
-        // 检查是否为表格开始
-        const isTableStart = this.TABLE_REGEX.test(currentLine);
-        const isSeparator = nextLine && this.isSeparatorLine(nextLine);
 
-        if (isTableStart && isSeparator) {
-            // 验证分隔符行的列数是否与表头匹配
-            const headerCells = this.escapedSplit(currentLine);
-            const separatorCells = this.escapedSplit(nextLine);
-            if (headerCells.length === separatorCells.length) {
-                ctx.setInTable(true);
-                ctx.setTableStartIndex(index); // 记录表格开始位置
-                return true;
-            }
+        const isTableStart = this.TABLE_REGEX.test(line);
+        console.log('TableRule match:', isTableStart, nextLine);
+        if (!isTableStart) return false;
+
+        // 检查下一行是否为分隔符行
+        if (nextLine && this.isSeparatorLine(nextLine)) {
+            return true;
         }
-        return false;
+        if (line.match(/^ *[-*]/)) return false;
+        // return false;
+        return this.TABLE_REGEX.test(line.trim());
     }
 
+    /**
+     * 是否是分隔符行
+     * @param line 
+     * @returns 
+     */
     private isSeparatorLine(line: string): boolean {
         const cells = this.escapedSplit(line);
+        console.log(
+            '处理后的 cells:',
+            cells
+        );
         return cells.every(cell => {
-            return this.TABLE_ALIGN_REGEX.test(cell.trim()) && cell.trim().length >= 3;
+            const trimmed = cell.trim();
+            return trimmed.length >= 3 && this.TABLE_ALIGN_REGEX.test(trimmed);
         });
     }
 
+    /**
+     * 处理转义分割符
+     * @param str 
+     * @returns 
+     */
     private escapedSplit(str: string): string[] {
-        const result: string[] = [];
-        const max = str.length;
-        let pos = 0;
-        let ch = str.charCodeAt(pos);
-        let isEscaped = false;
-        let lastPos = 0;
-        let current = '';
-
-        while (pos < max) {
-            if (ch === 0x7c/* | */) {
-                if (!isEscaped) {
-                    result.push(current + str.substring(lastPos, pos));
-                    current = '';
-                    lastPos = pos + 1;
-                } else {
-                    current += str.substring(lastPos, pos - 1);
-                    lastPos = pos;
-                }
-            }
-
-            isEscaped = (ch === 0x5c/* \ */);
-            pos++;
-            ch = str.charCodeAt(pos);
-        }
-
-        result.push(current + str.substring(lastPos));
-        return result.slice(1, -1).map(c => c.trim());
+        return str.split(/\\\|/g).flatMap((part, index) => {
+            const cells = part.split(/\|/g);
+            return cells.slice(1, -1).map(cell => cell.trim());
+        });
+        // return str.replace(/\\|/g, '|').split(/\|/).slice(1, -1).map(cell => cell.trim());
+        // // 处理转义竖线
+        // const normalizedStr = str.replace(/\\|/g, '|');
+        // // 分割单元格并过滤空字符串
+        // const cells = normalizedStr.split(/\|/).slice(1, -1);
+        // // 去除每个单元格的前后空格，并压缩中间空格
+        // return cells.map(cell => cell.trim().replace(/\s+/g, ' '));
     }
 
+
     execute(line: string, ctx: ParsingContext): Token[] {
-        const lines = ctx.getLines();
-        const index = ctx.getCurrentLineIndex();
         const tokens: Token[] = [];
-        const currentLine = line;
+
 
         if (!ctx.isInTable) {
-            const nextLine = lines[index + 1];
+            const nextLine = ctx.getLines()[ctx.getCurrentLineIndex() + 1];
             if (nextLine && this.isSeparatorLine(nextLine)) {
                 // 开始新表格
-                tokens.push(new Token({
-                    type: TokenType.TABLE_OPEN,
-                    tag: 'table',
-                    nesting: 1,
-                    content: '',
-                    block: true,
-                }));
 
-                // 处理表头和分隔符
-                this.processHeader(currentLine, tokens);
                 const alignments = this.processSeparator(nextLine);
                 ctx.setTableAlignments(alignments);
-
+                console.log('执行了表格处理', ctx.getLines(), ctx.getLines().length)
+                console.log('currentLineIndex', ctx.getCurrentLineIndex())
                 // 处理表格主体
-                tokens.push(new Token({
-                    type: TokenType.TABLE_BODY_OPEN,
-                    tag: 'tbody',
-                    nesting: 1,
-                    content: '',
-                    block: true,
-                }));
+                tokens.push(new Token({ type: TokenType.TABLE_OPEN, tag: 'table', nesting: 1 }));
+                tokens.push(new Token({ type: TokenType.TABLE_BODY_OPEN, tag: 'tbody', nesting: 1 }));
+                this.processHeader(line, tokens);
 
-                // 处理后续数据行
-                for (let i = index + 2; i < lines.length; i++) {
-                    const dataLine = lines[i];
-                    if (!this.TABLE_DATA_REGEX.test(dataLine)) {
+                // 自动检测后续数据行
+                let i = ctx.getCurrentLineIndex() + 2;
+                while (i < ctx.getLines().length) {
+                    const dataLine = ctx.getLines()[i];
+                    console.log('处理数据行', dataLine);
+                    console.log('行检测', this.isTableLine(dataLine))
+                    if (this.isTableLine(dataLine)) {
+                        console.log('处理表格数据');
+                        this.processDataRow(dataLine, alignments, tokens);
+                    } else {
                         break;
                     }
-                    this.processDataRow(dataLine, alignments, tokens);
+                    i++;
                 }
 
-                // 关闭表格标签
+                ctx.setTableAlignments(alignments);
+                // 关闭表格标签并重置状态
                 tokens.push(
-                    new Token({
-                        type: TokenType.TABLE_BODY_CLOSE,
-                        tag: 'tbody',
-                        nesting: -1,
-                        content: '',
-                        block: true,
-                    }),
-                    new Token({
-                        type: TokenType.TABLE_CLOSE,
-                        tag: 'table',
-                        nesting: -1,
-                        content: '',
-                        block: true,
-                    })
+                    new Token({ type: TokenType.TABLE_BODY_CLOSE, tag: 'tbody', nesting: -1 }),
+                    new Token({ type: TokenType.TABLE_CLOSE, tag: 'table', nesting: -1 })
                 );
-
                 ctx.setInTable(false);
+                ctx.setTableAlignments([]);
+                // tokens[0].nesting = 1;
+                // tokens[1].nesting = 1;
+                // tokens[-2].nesting = -1;
+                // tokens[-1].nesting = -1;
             }
-        } else if (this.TABLE_DATA_REGEX.test(currentLine)) {
-            // 处理表格数据行，使用保存的对齐信息
-            this.processDataRow(currentLine, ctx.tableAlignments || [], tokens);
+        } else {
+            this.processDataRow(line, ctx.tableAlignments || [], tokens);
         }
-
         return tokens;
     }
 
+    /**
+     * 处理表头
+     * @param line 输入的行内容
+     * @param tokens 当前的 Token 流
+     */
     private processHeader(line: string, tokens: Token[]): void {
         const cells = this.escapedSplit(line);
-        tokens.push(
-            new Token({
-                type: TokenType.TABLE_HEADER_OPEN,
-                tag: 'thead',
-                nesting: 1,
-                content: '',
-                block: true,
-            }),
-            new Token({
-                type: TokenType.TABLE_ROW_OPEN,
-                tag: 'tr',
-                nesting: 1,
-                content: '',
-                block: true,
-            })
-        );
-
+        tokens.push(new Token({ type: TokenType.TABLE_HEADER_OPEN, nesting: 1, block: true, markup: 'thead' }));
+        tokens.push(new Token({ type: TokenType.TABLE_ROW_OPEN, nesting: 1 }));
+        console.log('执行表头处理')
         cells.forEach(cell => {
-            tokens.push(
-                new Token({ type: TokenType.TABLE_CELL_OPEN, tag: 'th', nesting: 1 }),
-                new Token({ type: TokenType.TEXT, content: cell }),
-                new Token({ type: TokenType.TABLE_CELL_CLOSE, tag: 'th', nesting: -1 })
-            );
+            tokens.push(new Token({
+                type: TokenType.TABLE_CELL_OPEN,
+                tag: 'th',
+                nesting: 1,
+                // attrs: { style: 'text-align: left' }
+            }));
+            tokens.push(new Token({ type: 'text', content: cell }));
+            tokens.push(new Token({ type: TokenType.TABLE_CELL_CLOSE, tag: 'th', nesting: -1 }));
         });
 
-        tokens.push(
-            new Token({ type: TokenType.TABLE_ROW_CLOSE, tag: 'tr', nesting: -1 }),
-            new Token({ type: TokenType.TABLE_HEADER_CLOSE, tag: 'thead', nesting: -1 })
-        );
+        tokens.push(new Token({ type: TokenType.TABLE_ROW_CLOSE, nesting: -1 }));
+        tokens.push(new Token({ type: TokenType.TABLE_HEADER_CLOSE, nesting: -1 }));
     }
 
+    // 处理分隔符行
     private processSeparator(line: string): string[] {
-        const cells = this.escapedSplit(line);
-        return cells.map(cell => {
-            const left = cell.startsWith(':') ? 'left' : '';
-            const right = cell.endsWith(':') ? 'right' : '';
-            return [left, right].filter(Boolean).join(' ') || 'center';
+        console.log('执行分隔符处理')
+        return this.escapedSplit(line).map(cell => {
+            const left = cell.startsWith(':') ? 'left' : 'center';
+            const right = cell.endsWith(':') ? 'right' : left;
+            return [left, right].filter(Boolean).join(' ') || 'left';
         });
     }
 
+    /**
+     * 处理数据行
+     * 
+     * @author COOSONWEI
+     * @param line 输入的行内容
+     * @param alignments 对齐方式
+     * @param tokens 当前的 Token 流
+     */
     private processDataRow(line: string, alignments: string[], tokens: Token[]): void {
-        tokens.push(
-            new Token({ type: TokenType.TABLE_ROW_OPEN, tag: 'tr', nesting: 1 })
-        );
+        console.log('执行数据行处理');
+        tokens.push(new Token({ type: TokenType.TABLE_ROW_OPEN, tag: 'tr', nesting: 1 }));
 
         const cells = this.escapedSplit(line);
         cells.forEach((cell, index) => {
-            tokens.push(
-                new Token({
-                    type: TokenType.TABLE_CELL_OPEN,
-                    tag: 'td',
-                    nesting: 1,
-                    attrs: { style: `text-align: ${alignments[index] || 'left'}` }
-                }),
-                new Token({ type: TokenType.TEXT, content: cell }),
-                new Token({ type: TokenType.TABLE_CELL_CLOSE, tag: 'td', nesting: -1 })
-            );
+            const alignment = alignments[index] || 'left';
+            tokens.push(new Token({
+                type: TokenType.TABLE_CELL_OPEN,
+                tag: 'td',
+                nesting: 1,
+                attrs: { style: `text-align: ${alignment}` }
+            }));
+            tokens.push(new Token({ type: 'text', content: cell }));
+            tokens.push(new Token({ type: TokenType.TABLE_CELL_CLOSE, tag: 'td', nesting: -1 }));
         });
 
-        tokens.push(
-            new Token({ type: TokenType.TABLE_ROW_CLOSE, tag: 'tr', nesting: -1 })
-        );
+        tokens.push(new Token({ type: TokenType.TABLE_ROW_CLOSE, tag: 'tr', nesting: -1 }));
     }
+
+    /**
+     * 是否是数据行判断（对于正则表达式判断发现正则表达式并不百分百成功）
+     * @param line 
+     * @param ctx 
+     * @returns 
+     */
+    public isTableLine(line: string): boolean {
+        const trimmedLine = line.trim();
+
+        if (trimmedLine === '') return false;
+
+        // 检查是否以 | 开头和结尾
+        if (trimmedLine[0] !== '|' || trimmedLine[trimmedLine.length - 1] !== '|') {
+            return false;
+        }
+
+        let pos = 1;
+        let prevChar = trimmedLine[pos - 1];
+        let hasNonWhiteSpace = false;
+        const length = trimmedLine.length;
+        let inCell = false;
+        for (let i = 1; i < trimmedLine.length - 1; i++) {
+          const ch = trimmedLine[i];
+          if (ch === '\\') {
+            // 转义字符，跳过下一个字符
+            i++;
+            continue;
+          }
+          if (ch === '|') {
+            if (!inCell) {
+              // 空单元格，跳过
+              continue;
+            }
+            inCell = false;
+          } else {
+            inCell = true;
+            if (!this.isSpace(ch)) {
+              hasNonWhiteSpace = true;
+            }
+          }
+        }
+
+        // 最后一个字符必须是 |
+        if (trimmedLine[length - 1] !== '|') return false;
+
+        return hasNonWhiteSpace;
+    }
+
+    private isSpace(ch: string): boolean {
+        return ch === ' ' || ch === '\t' || ch === '\n' || ch === '\r';
+    }
+
 }

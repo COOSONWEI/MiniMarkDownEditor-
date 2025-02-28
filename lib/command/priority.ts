@@ -9,5 +9,5 @@ export const RULE_PRIORITIES = {
     LIST: 14,
     HORIZONTAL: 13,
     BLOCKQUOTE: 12,
-    TABLE: 11,
+    TABLE: 20,
 }

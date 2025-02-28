@@ -74,10 +74,14 @@ export class BlockParser {
   private determineEvent(line: string): ParserEvent {
     if (!line.trim()) return ParserEvent.EMPTY_LINE;
     if (line.startsWith('#')) return ParserEvent.HEADING_MARKER;
-    if (line.match(/^[\-\*\+]\s/)) return ParserEvent.LIST_MARKER;
+    if (line.includes('|') && !line.match(/^ *[-*]/)) {
+      return ParserEvent.TABLE_MARKER;
+    }
+    if (line.match(/^[\-\*\+]\s/)) {
+      return ParserEvent.LIST_MARKER;
+    }
     if (line.startsWith('>')) return ParserEvent.QUOTE_MARKER;
     if (line.startsWith('```')) return ParserEvent.CODE_MARKER;
-    if (line.includes('|')) return ParserEvent.TABLE_MARKER;
     return ParserEvent.TEXT;
   }
 }
