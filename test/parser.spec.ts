@@ -1,5 +1,4 @@
 import {MarkdownParser} from "../lib/core/parser";
-import {Token, TokenType} from "../lib/tokens/token";
 import * as fs from 'fs';
 import * as path from 'path';
 

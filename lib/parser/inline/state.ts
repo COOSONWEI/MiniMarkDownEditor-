@@ -1,7 +1,6 @@
 // 行内状态机
 
-import { ParsingContext } from "../../core/state";
-import {Token, TokenType} from "../../tokens/token";
+import {Token} from "../../tokens/token";
 import {LexerState} from "./index";
 
 
