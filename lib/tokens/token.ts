@@ -36,7 +36,12 @@ export enum TokenType {
     IMAGE_CLOSE = "image_close", // 图片结束
     LINK_OPEN = "link_open", // 链接开始
     LINK_CLOSE = "link_close", // 链接结束
-    
+    STRONG_OPEN = "strong_open", // 加粗开始
+    STRONG_CLOSE = "strong_close", // 加粗结束
+    EM_OPEN = "em_open", // 斜体开始
+    EM_CLOSE = "em_close", // 斜体结束
+    DEL_OPEN = "del_open", // 删除开始
+    DEL_CLOSE = "del_close", // 删除结束
 }
 
 /**
