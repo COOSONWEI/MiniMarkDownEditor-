@@ -5,6 +5,7 @@
  */
 
 
+import { RULE_PRIORITIES } from "../../../command/priority";
 import { ParsingContext } from "../../../core/state";
 import { Token, TokenType } from "../../../tokens/token";
 import { BaseBlockRule } from "./base";
@@ -12,14 +13,19 @@ import { BaseBlockRule } from "./base";
 export class ListRule extends BaseBlockRule {
     private unorderedRegex = /^([ \t]*)([-\*\+])\s+(.*)/;
     private orderedRegex = /^([ \t]*)(\d+)\.\s+(.*)/;
-    
+    private static regex = /^[\-\*\+]\s+(.*)/; // 正则表达式
+    private static MAX_NESTING_LEVEL = 5; // 最大嵌套层级
 
     constructor() {
-        super(14); // p<list<h
+        super(RULE_PRIORITIES.LIST); // p<list<h
     }
 
 
     match(line: string, ctx: ParsingContext): boolean {
+        // 如果已经达到最大嵌套层级，不再匹配新的列表项
+        if (ctx.currentListLevel >= ListRule.MAX_NESTING_LEVEL) {
+            return false;
+        }
         return this.unorderedRegex.test(line) || this.orderedRegex.test(line);
     }
 
@@ -43,39 +49,35 @@ export class ListRule extends BaseBlockRule {
         const content = match[3];
         const currentLevel = ctx.currentListLevel;
 
-        // 处理列表层级变化
-        while (
-            currentLevel > 0 &&
-            indent <= ctx.getCurrentListIndent()
-        ) {
-            ctx.leaveListLevel();
-            tokens.push(
-                new Token({
-                    type: TokenType.LIST_CLOSE,
-                    tag: isOrdered ? 'ol' : 'ul',
-                    nesting: -1,
-                    block: true,
-                    level: currentLevel
-                }
-                )
-            );
+        // 处理列表层级变化，确保不会超过最大层级
+        if (currentLevel > 0) {
+            // 如果缩进小于等于当前层级的缩进，关闭当前层级
+            while (currentLevel > 0 && indent <= ctx.getCurrentListIndent() && ctx.currentListLevel > 0) {
+                ctx.leaveListLevel();
+                tokens.push(
+                    new Token({
+                        type: TokenType.LIST_CLOSE,
+                        tag: isOrdered ? 'ol' : 'ul',
+                        nesting: -1,
+                        block: true,
+                        level: currentLevel
+                    })
+                );
+            }
         }
 
-
-        if (
-            currentLevel === 0 ||
-            indent > ctx.getCurrentListIndent()
-        ) {
+        // 只有在未达到最大层级时才创建新的列表层级
+        if (currentLevel < ListRule.MAX_NESTING_LEVEL && 
+            (currentLevel === 0 || indent > ctx.getCurrentListIndent())) {
             ctx.enterListLevel(indent);
             tokens.push(
                 new Token({
                     type: TokenType.LIST_OPEN,
                     tag: isOrdered ? 'ol' : 'ul',
-                    nesting: -1,
+                    nesting: 1,
                     block: true,
                     level: currentLevel
-                }
-                )
+                })
             );
         }
 

@@ -1,5 +1,7 @@
+
+import { RULE_PRIORITIES } from "../../../command/priority";
 import { ParsingContext } from "../../../core/state";
-import { Token } from "../../../tokens/token";
+import { Token, TokenType } from "../../../tokens/token";
 import { BlockRule } from "../state";
 
 /**
@@ -8,12 +10,19 @@ import { BlockRule } from "../state";
  * @author COOSONWEI
  */
 export class EmptyLineRule implements BlockRule {
-    priority = 50; // 高优先级
+    priority = RULE_PRIORITIES.EMPTY_LINE; // 高优先级
   
     match(line: string, ctx: ParsingContext): boolean {
       return line.trim().length === 0;
     }
     execute(line: string, ctx: ParsingContext): Token[] {
-      return []; // 忽略空行
+      // 遇到空行段落自动闭合
+      if (ctx.isInParagraph) {
+        ctx.setInParagraph(false);
+        return [new Token({ type: TokenType.PARAGRAPH_CLOSE, tag: 'p', nesting: -1 })];
+      }
+      ctx.reset(); // 重置其他状态
+      return [];
+    
     }
   }

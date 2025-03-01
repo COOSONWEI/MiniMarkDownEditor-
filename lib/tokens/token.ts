@@ -30,8 +30,7 @@ export enum TokenType {
     TABLE_ROW_CLOSE = "table_row_close", // 表格行结束
     TABLE_CELL_OPEN = "table_cell_open", // 表格单元格开始
     TABLE_CELL_CLOSE = "table_cell_close", // 表格单元格结束
-    HR_OPEN = "hr_open", // 水平线开始
-    HR_CLOSE = "hr_close", // 水平线结束
+    HORIZONTAL_RULE = "hr", // 水平线（自闭合）
     IMAGE_OPEN = "image_open", // 图片开始
     IMAGE_CLOSE = "image_close", // 图片结束
     LINK_OPEN = "link_open", // 链接开始

@@ -1,3 +1,7 @@
+
+/**
+ * 上下文解析器
+ */
 export class ParsingContext {
   public currentLine = 0;
   public indentLevel = 0;
@@ -7,6 +11,10 @@ export class ParsingContext {
       inParagraph: boolean; // 段落状态
       headingActive: boolean; // 标题状态
       inBlockquote: boolean; // 引用状态
+      inTable: boolean; // 表格状态
+      tableAlignments: string[]; // 表格列对齐方式
+      tableRowCount: number; // 表格行数
+      tableStartIndex: number | null; // 表格起始位置
       // TODO: 后续可能考虑抽离为单独的层级管理
       listLevelStack: number[]; // 列表层级栈
       quoteLevelStack: number[]; // 引用层级栈
@@ -17,6 +25,10 @@ export class ParsingContext {
           inParagraph: false,
           inBlockquote: false,
           headingActive: false,
+          inTable: false,
+          tableAlignments: [],
+          tableRowCount: 0,
+          tableStartIndex: null,
           listLevelStack: [],
           quoteLevelStack: []
       }
@@ -42,10 +54,74 @@ export class ParsingContext {
       return this.currentState.headingActive;
   }
 
+  // 引用状态
+  get isInBlockquote() {
+      return this.currentState.inBlockquote;
+  }
+
+  // 表格状态
+  get isInTable() {
+      return this.currentState.inTable;
+  }
+
+  // 获取表格列对齐方式
+  get tableAlignments() {
+      return this.currentState.tableAlignments;
+  }
+
+  // 获取表格行数
+  get tableRowCount() {
+      return this.currentState.tableRowCount;
+  }
+
+  // 获取表格起始位置
+  get tableStartIndex(): number | null {
+      return this.currentState.tableStartIndex;
+  }
+
+  // 设置表格起始位置
+  setTableStartIndex(index: number | null) {
+      this.currentState.tableStartIndex = index;
+  }
+
+  // 设置 inTable 状态
+  setInTable(value: boolean) {
+      this.currentState.inTable = value;
+      if (!value) {
+          this.currentState.tableAlignments = [];
+          this.currentState.tableRowCount = 0;
+          this.currentState.tableStartIndex = null;
+      }
+  }
+
   // 获取当前列表层级
   get currentListLevel() {
       return this.currentState.listLevelStack.length;
   }
+
+  // 获取当前列表层级的缩进
+  getCurrentListIndent(): number {
+      const stack = this.currentState.listLevelStack;
+      return stack.length > 0 ? stack[stack.length - 1] : 0;
+  }
+
+  // 进入新的列表层级
+  enterListLevel(indent: number) {
+      if (this.currentState.listLevelStack.length >= 5) {
+          return; // 防止超过最大嵌套层级
+      }
+      this.currentState.listActive = true;
+      this.currentState.listLevelStack.push(indent);
+  }
+
+  // 退出当前列表层级
+  leaveListLevel() {
+      if (this.currentState.listLevelStack.length > 0) {
+          this.currentState.listLevelStack.pop();
+          this.currentState.listActive = this.currentState.listLevelStack.length > 0;
+      }
+  }
+
   // 获取当前引用层级
   get currentQuoteLevel() {
       return this.currentState.quoteLevelStack.length;
@@ -59,8 +135,12 @@ export class ParsingContext {
           inParagraph: this.currentState.inParagraph,
           inBlockquote: this.currentState.inBlockquote,
           headingActive: this.currentState.headingActive,
-          listLevelStack: [...this.currentState.listLevelStack], // 复制列表层级栈
-          quoteLevelStack: [...this.currentState.quoteLevelStack] // 复制引用层级栈
+          inTable: this.currentState.inTable,
+          tableAlignments: [...this.currentState.tableAlignments],
+          tableRowCount: this.currentState.tableRowCount,
+          tableStartIndex: this.currentState.tableStartIndex,
+          listLevelStack: [...this.currentState.listLevelStack],
+          quoteLevelStack: [...this.currentState.quoteLevelStack]
       });
   }
 
@@ -86,31 +166,63 @@ export class ParsingContext {
       this.currentState.headingActive = value;
   }
 
-  // 进入新的列表层级
-  enterListLevel(indent: number) {
-      this.currentState.listLevelStack.push(indent);
+  // 设置表格列对齐方式
+  setTableAlignments(alignments: string[]) {
+      this.currentState.tableAlignments = alignments;
   }
 
-  // 离开当前列表层级
-  leaveListLevel() {
-      if (this.currentState.listLevelStack.length > 0) {
-          this.currentState.listLevelStack.pop();
-      }
+  // 增加表格行数
+  incrementTableRowCount() {
+      this.currentState.tableRowCount++;
   }
 
-  // 获取当前列表层级的缩进
-  getCurrentListIndent() {
-      return this.currentState.listLevelStack[this.currentState.listLevelStack.length - 1];
+  // 获取当前行的列对齐方式
+  getColumnAlignment(index: number): string {
+      return this.currentState.tableAlignments[index] || 'left';
   }
 
-  // 进入新的引用层级
+//   // 列表层级管理
+//   enterListLevel(indent: number) {
+//       this.currentState.listLevelStack.push(indent);
+//   }
+
+//   leaveListLevel() {
+//       this.currentState.listLevelStack.pop();
+//   }
+
+//   getCurrentListIndent(): number {
+//       const stack = this.currentState.listLevelStack;
+//       return stack.length > 0 ? stack[stack.length - 1] : 0;
+//   }
+
+  // 引用层级管理
   enterQuoteLevel() {
       this.currentState.quoteLevelStack.push(1);
   }
-  // 离开当前引用层级
+
   leaveQuoteLevel() {
-      if (this.currentState.quoteLevelStack.length > 0) {
-          this.currentState.quoteLevelStack.pop();
-      }
+      this.currentState.quoteLevelStack.pop();
+  }
+
+  // 获取所有行
+  private _lines: string[] = [];
+  setLines(lines: string[]) {
+      this._lines = lines;
+  }
+
+  getLines(): string[] {
+      return this._lines;
+  }
+
+  getCurrentLineIndex(): number {
+      return this.currentLine;
+  }
+
+  // 重置状态
+  reset() {
+    this.setInParagraph(false);
+    this.setListActive(false);
+    this.setHeadingActive(false);
+    // 可扩展其他需要重置的状态
   }
 }
