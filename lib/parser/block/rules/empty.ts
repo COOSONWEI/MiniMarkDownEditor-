@@ -19,7 +19,7 @@ export class EmptyLineRule implements BlockRule {
       // 遇到空行段落自动闭合
       if (ctx.isInParagraph) {
         ctx.setInParagraph(false);
-        return [new Token({ type: TokenType.PARAGRAPH_CLOSE, tag: 'p', nesting: -1 })];
+        return [new Token({ type: TokenType.PARAGRAPH_CLOSE, tag: 'p', nesting: -1 , block: true})];
       }
       ctx.reset(); // 重置其他状态
       return [];

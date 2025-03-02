@@ -15,17 +15,18 @@ export abstract class BaseBlockRule extends BlockRule {
     protected constructor(priority: number) {
       super({ priority });
     }
-  
+    protected  inlineParser: InlineParser;
+
     // 内联解析
     public parseInlineContent(text: string): Token[] {
-        // TODO: 后续需要改为独立的内联解析器
-      const inlineParser = new InlineParser();
-      const strongRule = new StrongRule();
-      inlineParser.registerRule(strongRule);
-      inlineParser.registerRule(new EmRule());
-      inlineParser.registerRule(new DelRule());
-      console.log('当前处理的内联文本为：' + text);
-      return inlineParser.parseInline(text);
-      // return [new Token({ type: TokenType.INLINE, content: text, children: [new Token({type: TokenType.TEXT, content: text})]})];
+        
+      // if (!this.inlineParser) {
+      //   this.inlineParser = new InlineParser();
+      //   this.inlineParser.registerRule(new StrongRule());
+      //   this.inlineParser.registerRule(new EmRule());
+      //   this.inlineParser.registerRule(new DelRule());
+      // }
+      // return this.inlineParser.parseInline(text);
+      return [new Token({ type: TokenType.INLINE, content: text, children: [new Token({type: TokenType.TEXT, content: text})]})];
     }
   }

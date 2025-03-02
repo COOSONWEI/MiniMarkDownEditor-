@@ -1,6 +1,7 @@
 // 行内解析器功能实现
 
 import {Token, TokenType} from "../../tokens/token";
+import { InlineParserState } from "./parserState";
 import {InlineRule} from "./state";
 
 /**
@@ -19,110 +20,92 @@ export enum LexerState {
 // TODO: 解决多tokens嵌套问题
 
 export class InlineParser {
-    private rules: InlineRule[] = [];   // lexer状态
-    public static buffer: string[] = [];  // 文本流
-    public static tokens: Token[] = []; // tokens结果
-    public static position = 0; // 当前位置
+    private rules: InlineRule[] = [];   // 解析规则列表
+    private parserState: InlineParserState; // 解析器状态管理
 
-    public static state: LexerState[] = [];
-
-    public static getCurrentState(): LexerState {
-        return InlineParser.state[InlineParser.state.length - 1];
+    constructor() {
+        this.parserState = new InlineParserState();
     }
 
-    public static travelState(state: LexerState): boolean {
-        for (let i = state.length - 1; i >= 0; i--) {
-            if (InlineParser.state[i] === state) {
-                InlineParser.state.splice(i, 1);
-                return true;
-            }
-        }
-        return false;
+    /**
+     * 获取当前状态
+     * @returns 当前状态
+     */
+    public getCurrentState(): LexerState {
+        return this.parserState.getCurrentState();
+    }
+
+    /**
+     * 尝试离开指定状态
+     * @param state 要离开的状态
+     * @returns 是否成功离开状态
+     */
+    public travelState(state: LexerState): boolean {
+        return this.parserState.travelState(state);
     }
 
 
+    /**
+     * 注册解析规则
+     * @param rule 要注册的规则
+     */
     public registerRule(rule: InlineRule): void {
+        rule.setParser(this); // 设置解析器实例引用
         this.rules.push(rule);
         this.rules.sort((a, b) => b.priority - a.priority); // 按优先级排序
     }
 
+    /**
+     * 解析行内内容
+     * @param text 要解析的文本
+     * @returns 解析后的Token数组
+     */
     public parseInline(text: string): Token[] {
+        // 重置状态，确保每次解析都是从干净的状态开始
+        this.parserState.reset();
         return this.lexer(text);
     }
 
+    /**
+     * 词法分析器
+     * @param text 要分析的文本
+     * @returns 分析后的Token数组
+     */
     private lexer(text: string): Token[] {
-        while (InlineParser.position < text.length) {
-            let isSpecial = false
+        while (this.parserState.getPosition() < text.length) {
+            let isSpecial = false;
             for (const rule of this.rules) {
-                if (rule.match(text, InlineParser.tokens, InlineParser.position)) {
+                if (rule.match(text, this.parserState.getTokens(), this.parserState.getPosition())) {
                     isSpecial = true;
-                    InlineParser.flushTextBuffer();
-                    rule.execute(text, InlineParser.tokens, InlineParser.position);
+                    this.parserState.flushTextBuffer();
+                    rule.execute(text, this.parserState.getTokens(), this.parserState.getPosition());
                     break;
                 }
             }
             if (!isSpecial) {
-                InlineParser.buffer.push(text[InlineParser.position]);
-                // if (InlineParser.getCurrentState() !== LexerState.DEFAULT) {
-                //     InlineParser.state.push(LexerState.DEFAULT);
-                // }
-                InlineParser.position++;
+                this.parserState.addToBuffer(text[this.parserState.getPosition()]);
+                this.parserState.advance();
             }
         }
-        console.log("目前的state为：" + InlineParser.state);
-        this.solveRestState();
-        return InlineParser.tokens;
+        
+        // 处理未闭合的状态
+        this.parserState.solveRestState();
+        return this.parserState.getTokens();
     }
 
-    public static flushTextBuffer(): void {
-        if (InlineParser.buffer.length > 0) {
-            this.tokens.push(new Token({
-                type: TokenType.TEXT,
-                content: InlineParser.buffer.join(''),
-            }))
-            InlineParser.buffer = [];
-        }
-        return;
+    /**
+     * 获取解析器状态管理实例
+     * @returns 解析器状态管理实例
+     */
+    public getParserState(): InlineParserState {
+        return this.parserState;
     }
-
-    private solveRestState(): void {
-        while (InlineParser.state.length > 0 && InlineParser.state[InlineParser.state.length - 1] !== LexerState.DEFAULT) {
-            InlineParser.state.pop();
-          }
-        for (let i = InlineParser.state.length - 1; i >= 0; i--) {
-            if (InlineParser.state[i] === LexerState.DEFAULT) {
-                InlineParser.state.splice(i, 1);
-            }
-        }
-        console.log("solveRestState中的" + InlineParser.state);
-        this.seekUnclosedToken();
-    }
-
-    // 将tokens当做缓存，后续并入result的text
-    private seekUnclosedToken(): void {
-        let i = InlineParser.state.length - 1;
-        while (i >= 0) {
-            const stateItem = InlineParser.state[i];
-            if (!stateItem) {
-                i--;
-                continue;
-            }
-            let found = false;
-            for (let j = InlineParser.tokens.length - 1; j >= 0; j--) {
-                if (InlineParser.state.length === 0) {
-                    return;
-                }
-                const tokenType = InlineParser.tokens[j].type.toLowerCase();
-                const target = stateItem.toLowerCase().substring(3) + "_open";
-                if (target === tokenType) {
-                    InlineParser.tokens[j].type = TokenType.TEXT;
-                    InlineParser.state.pop();
-                    console.log(InlineParser.state);
-                    found = true;
-                    break;
-                }
-            }
-            i = found ? InlineParser.state.length - 1 : i - 1;
-        }
+    
+    /**
+     * 设置解析器状态管理实例
+     * @param state 新的状态管理实例
+     */
+    public setParserState(state: InlineParserState): void {
+        this.parserState = state;
     }
 }

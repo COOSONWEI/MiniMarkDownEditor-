@@ -16,21 +16,28 @@ export class EmRule extends InlineRule {
     }
 
     execute(text: string, tokens: Token[], position: number): void {
-        InlineParser.position++
-        if (InlineParser.travelState(this.state)) {
-            InlineParser.tokens.push(this.createNewToken(-1))
+        // 获取当前解析器实例
+        const parser = this.getParser();
+        const parserState = parser.getParserState();
+        
+        const start = position;
+        parserState.advance(1); // 前进1个字符
+        
+        if (parser.getCurrentState() === LexerState.IN_EM) {
+            parserState.travelState(LexerState.IN_EM);
+            tokens.push(this.createNewToken(-1, start, start + 1));
         } else {
-            InlineParser.state.push(this.state);
-            InlineParser.tokens.push(this.createNewToken(1)) // 问题所在
+            parserState.pushState(LexerState.IN_EM);
+            tokens.push(this.createNewToken(1, start, start + 1));
         }
-        return;
+        
     }
 
-    createNewToken(nesting: 1 | 0 | -1): Token {
+    createNewToken(nesting: 1 | 0 | -1, start: number, end: number) {
         return new Token({
             type: nesting === -1 ? TokenType.EM_CLOSE : TokenType.EM_OPEN,
             nesting: nesting,
-            map: [InlineParser.position - 1, InlineParser.position - 1],
+            map: [start, end],
             content: "*"
         });
     }

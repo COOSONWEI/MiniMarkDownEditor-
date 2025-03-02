@@ -4,6 +4,7 @@ import { TokenType } from '../../../tokens/token';
 import { ParsingContext } from '../../../core/state';
 import { RULE_PRIORITIES } from '../../../command/priority';
 import { BaseBlockRule } from './base';
+import { InlineTokenizer } from '../../inline/tokenizer';
 
 /**
  * 段落规则
@@ -33,17 +34,6 @@ export class ParagraphRule extends BaseBlockRule {
     const tokens: Token[] = [];
     const trimmedLine = line.trim();
     
-    
-    
-
-    // if (trimmedLine.length === 0) {
-    //   if (ctx.isInParagraph) {
-    //     ctx.setInParagraph(false);
-    //     tokens.push(new Token({ type: TokenType.PARAGRAPH_CLOSE, tag: 'p', nesting: -1, block: true }));
-    //   }
-    //   return tokens;
-    // }
-
       // 如果当前处于段落中且遇到空行，则关闭段落
   if (trimmedLine.length === 0 && ctx.isInParagraph) {
     ctx.setInParagraph(false);
@@ -70,9 +60,10 @@ export class ParagraphRule extends BaseBlockRule {
     // 添加文本内容
     // tokens.push(new Token({ type: TokenType.TEXT, content: line.replace(/\n+$/g, '') }));
     // 就进行内联处理
-    const inlineParser = this.parseInlineContent(line.replace(/\n+$/g, ''));
-    tokens.push(...inlineParser);
-
+     const inlineTokens = new InlineTokenizer().tokenize(line);
+     console.log('正在处理文本中的内容');
+    tokens.push(...inlineTokens);
+    console.log('文本处理完毕', inlineTokens);
     return tokens;
   }
 }

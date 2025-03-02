@@ -30,7 +30,14 @@ export enum ParserState {
   TABLE_EXIT = "TABLE_EXIT",
 
   // 终止状态
-  TERMINATED = "TERMINATED"
+  TERMINATED = "TERMINATED",
+
+    // 行级元素
+    IN_STRONG = 'IN_STRONG', // 加粗
+    IN_EM = 'IN_EM', // 斜体
+    IN_DEL = 'IN_DEL', // 删除线
+    IN_IMAGE = 'IN_IMAGE', // 图片
+    IN_LINK = 'IN_LINK', // 链接
 }
 
 // 解析器事件枚举

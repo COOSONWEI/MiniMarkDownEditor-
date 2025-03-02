@@ -1,8 +1,7 @@
 import { FSM } from "../lib/core/fsm/fsm";
 import { ParserEvent, ParserState } from "../lib/core/fsm/state";
 import { MarkdownParser } from "../lib/core/parser";
-import { ParsingContext } from "../lib/core/state";
-import { BlockParser } from "../lib/parser/block/state";
+import { RendererManager } from "../lib/core/renderer/rendererManager";
 import { Token, TokenType } from "../lib/tokens/token";
 import * as fs from 'fs';
 import * as path from 'path';
@@ -12,7 +11,7 @@ import * as path from 'path';
  */
 describe('MarkdownParser', () => {
   const parser = new MarkdownParser();
-
+  const render = new RendererManager();
 
   /**
    * 状态机测试
@@ -37,35 +36,65 @@ describe('MarkdownParser', () => {
   }
 
   // 段落测试
-  // test('段落解析', () => {
-  //   const mdContent = readMdFile('paragraphs.md');
-  //   const tokens = parser.parse(mdContent);
-  //   console.log('p tokens:', tokens);
-  // })
+  test('段落解析', () => {
+    const mdContent = readMdFile('paragraphs.md');
+    const tokens = parser.parse(mdContent);
+    const renderResult = render.render(tokens);
+
+    console.log('p tokens:', tokens);
+    console.log('P renderResult ', renderResult);
+     // 验证 Tokens
+     expect(tokens).toEqual([
+      new Token({ type: TokenType.PARAGRAPH_OPEN, tag: 'p', nesting: 1, block: true }),
+      new Token({ type: TokenType.TEXT, content: 'Hello World' }),
+      new Token({ type: TokenType.PARAGRAPH_CLOSE, tag: 'p', nesting: -1, block: true }),
+      new Token({ type: TokenType.PARAGRAPH_OPEN, tag: 'p', nesting: 1, block: true }),
+      new Token({ type: TokenType.TEXT, content: 'This is a paragraph' }),
+      new Token({ type: TokenType.PARAGRAPH_CLOSE, tag: 'p', nesting: -1, block: true }),
+      new Token({ type: TokenType.PARAGRAPH_OPEN, tag: 'p', nesting: 1, block: true }),
+      new Token({ type: TokenType.TEXT, content: '第二个内容' }),
+      new Token({ type: TokenType.PARAGRAPH_CLOSE, tag: 'p', nesting: -1, block: true }),
+     ]) 
+  })
 
   // 标题测试
-  // test('标题解析', () => {
-  //   const mdContent = readMdFile('headings.md');
-  //   const tokens = parser.parse(mdContent);
-  //   // console.log('h tokens:', tokens);
-  // })
+  test('标题解析', () => {
+    const mdContent = readMdFile('headings.md');
+    const tokens = parser.parse(mdContent);
+    const renderResult = render.render(tokens);
+
+    console.log('h tokens:', tokens);
+    console.log(
+      'H renderResult ',
+      renderResult
+    );
+    // 验证 Tokens
+   
+  })
 
   // 列表测试
-  // test('列表解析', () => {
-  //   const mdContent = readMdFile('list.md');
-  //   const tokens = parser.parse(mdContent);
-  //   // console.log('list tokens:', tokens);
-  // })
-  // 表格测试
-  test('表格解析', () => {
-    const mdContent = readMdFile('table.md');
+  test('列表解析', () => {
+    const mdContent = readMdFile('list.md');
     const tokens = parser.parse(mdContent);
-    // console.log('table tokens:', tokens);
-  })
+    // console.log('list tokens:', tokens);
+    const renderResult = render.render(tokens);
 
-  test('文本样式', () => {
-    const mdContent = readMdFile('inlineTest.md');
-    const tokens = parser.parse(mdContent);
-    console.log('text style tokens:', tokens);
+    console.log('List tokens:', tokens);
+    console.log(
+      'List renderResult \n ',
+      renderResult
+    );
   })
+  // 表格测试
+  // test('表格解析', () => {
+  //   const mdContent = readMdFile('table.md');
+  //   const tokens = parser.parse(mdContent);
+  //   // console.log('table tokens:', tokens);
+  // })
+
+  test('非token间嵌套加粗解析', () => {
+    const input = readMdFile('inlineTest.md');
+    const tokens = parser.parse(input);
+    console.log(input, ' token is', tokens);
+})
 });

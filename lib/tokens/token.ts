@@ -16,7 +16,7 @@ export enum TokenType {
     LIST_CLOSE = "list_close", // 列表结束
     LIST_ITEM_OPEN = "list_item_open", // 列表项开始
     LIST_ITEM_CLOSE = "list_item_close", // 列表项结束
-    COSE_OPEN = "code_open", // 代码块开始
+    CODE_OPEN = "code_open", // 代码块开始
     CODE_CLOSE = "code_close", // 代码块结束
     BLOCKQUOTE_OPEN = "blockquote_open", // 引用块开始
     BLOCKQUOTE_CLOSE = "blockquote_close", // 引用块结束

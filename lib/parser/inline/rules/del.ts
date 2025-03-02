@@ -16,21 +16,28 @@ export class DelRule extends InlineRule {
     }
 
     execute(text: string, tokens: Token[], position: number): void {
-        InlineParser.position += 2;
-        if (InlineParser.travelState(this.state)) {
-            InlineParser.tokens.push(this.createNewToken(-1))
+        // 获取当前解析器实例
+        const parser = this.getParser();
+        const parserState = parser.getParserState();
+        
+        const start = position;
+        parserState.advance(2); // 前进2个字符
+        
+        if (parser.getCurrentState() === LexerState.IN_DEL) {
+            parserState.travelState(LexerState.IN_DEL);
+            tokens.push(this.createNewToken(-1, start, start + 2));
         } else {
-            InlineParser.state.push(this.state);
-            InlineParser.tokens.push(this.createNewToken(1)) // 问题所在
+            parserState.pushState(LexerState.IN_DEL);
+            tokens.push(this.createNewToken(1, start, start + 2));
         }
-        return;
+        
     }
 
-    createNewToken(nesting: 1 | 0 | -1): Token {
+    createNewToken(nesting: 1 | 0 | -1, start: number, end: number) {
         return new Token({
             type: nesting === -1 ? TokenType.DEL_CLOSE : TokenType.DEL_OPEN,
             nesting: nesting,
-            map: [InlineParser.position - 2, InlineParser.position - 1],
+            map: [start, end],
             content: "~~"
         });
     }
