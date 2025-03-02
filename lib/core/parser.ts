@@ -10,7 +10,10 @@ import { ListRule } from '../parser/block/rules/list';
 import { BlockQuoteRule } from '../parser/block/rules/quote';
 import { HorizontalRule } from '../parser/block/rules/horizontal';
 import { TableRule } from '../parser/block/rules/table';
-
+import {InlineParser} from "../parser/inline";
+// import {StrongRule} from "../parser/inline/rules/strong";
+// import {EmRule} from "../parser/inline/rules/em";
+// import {DelRule} from "../parser/inline/rules/del";
 /**
  * 解析器基础类
  *
@@ -23,7 +26,7 @@ export class MarkdownParser {
 
     private context = new ParsingContext();
     private blockParser = new BlockParser();
-
+    private inlineParser = new InlineParser();
 
     constructor(options: { debug?: boolean } = {}) {
         this.debug = options.debug || false;
@@ -35,6 +38,10 @@ export class MarkdownParser {
         this.blockParser.registerRule(new HorizontalRule());
         this.blockParser.registerRule(new TableRule());
         this.blockParser.registerRule(new ParagraphRule());
+
+        // this.inlineParser.registerRule(new StrongRule());
+        // this.inlineParser.registerRule(new EmRule());
+        // this.inlineParser.registerRule(new DelRule());
     }
 
     parse(markdown: string): Token[] {

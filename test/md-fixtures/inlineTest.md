@@ -1,1 +1,3 @@
-**nihao~~zhonguo~~*nihao**bug**
+**nihao**
+~~zhonguo~~
+*italic*

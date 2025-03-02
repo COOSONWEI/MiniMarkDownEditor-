@@ -1,13 +1,14 @@
 import {InlineRule} from "../state";
 import {Token, TokenType} from "../../../tokens/token";
 import {InlineParser, LexerState} from "../index";
+import { RULE_PRIORITIES } from "../../../command/priority";
 
 /**
  * 斜体规则
  * @Author simms
  */
 export class DelRule extends InlineRule {
-    priority = 80;
+    priority = RULE_PRIORITIES.DEL;
     state = LexerState.IN_DEL;
 
     match(text: string, tokens: Token[], position: number): boolean {

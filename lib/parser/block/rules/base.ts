@@ -5,8 +5,11 @@
 
 import { Token } from "..";
 import { TokenType } from "../../../tokens/token";
+import { InlineParser } from "../../inline";
 import { BlockRule } from "../state";
-
+import {StrongRule} from "../../inline/rules/strong";
+import { EmRule } from "../../inline/rules/em";
+import { DelRule } from "../../inline/rules/del";
 
 export abstract class BaseBlockRule extends BlockRule {
     protected constructor(priority: number) {
@@ -14,8 +17,15 @@ export abstract class BaseBlockRule extends BlockRule {
     }
   
     // 内联解析
-    protected parseInlineContent(text: string): Token[] {
+    public parseInlineContent(text: string): Token[] {
         // TODO: 后续需要改为独立的内联解析器
-      return [new Token({ type: TokenType.INLINE, content: text, children: [new Token({type: TokenType.TEXT, content: text})]})];
+      const inlineParser = new InlineParser();
+      const strongRule = new StrongRule();
+      inlineParser.registerRule(strongRule);
+      inlineParser.registerRule(new EmRule());
+      inlineParser.registerRule(new DelRule());
+      console.log('当前处理的内联文本为：' + text);
+      return inlineParser.parseInline(text);
+      // return [new Token({ type: TokenType.INLINE, content: text, children: [new Token({type: TokenType.TEXT, content: text})]})];
     }
   }

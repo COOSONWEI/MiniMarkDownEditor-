@@ -1,13 +1,14 @@
 import {InlineRule} from "../state";
 import {Token, TokenType} from "../../../tokens/token";
 import {InlineParser, LexerState} from "../index";
+import { RULE_PRIORITIES } from "../../../command/priority";
 
 /**
  * 删除线规则
  * @Author simms
  */
 export class EmRule extends InlineRule {
-    priority = 60;
+    priority = RULE_PRIORITIES.EM;
     state = LexerState.IN_EM;
 
     match(text: string, tokens: Token[], position: number): boolean {

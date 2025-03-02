@@ -3,6 +3,7 @@
  */
 
 export const RULE_PRIORITIES = {
+    // Block 元素
     EMPTY_LINE: 50,
     PARAGRAPH: 10,
     HEADING: 15,
@@ -10,4 +11,10 @@ export const RULE_PRIORITIES = {
     HORIZONTAL: 13,
     BLOCKQUOTE: 12,
     TABLE: 20,
+    // 内联元素
+    DEL: 25,
+    EM: 26,
+    STRONG: 26,
+    IMAGE: 24,
+    LINK: 24,
 }

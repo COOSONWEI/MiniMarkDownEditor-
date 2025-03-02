@@ -1,18 +1,20 @@
 
-
-import { BlockRule } from '../state';
 import { Token } from '../../../tokens/token';
 import { TokenType } from '../../../tokens/token';
 import { ParsingContext } from '../../../core/state';
 import { RULE_PRIORITIES } from '../../../command/priority';
+import { BaseBlockRule } from './base';
 
 /**
  * 段落规则
  *
  * @author COOSONWEI
  */
-export class ParagraphRule implements BlockRule {
-  priority = RULE_PRIORITIES.PARAGRAPH; // 低优先级
+export class ParagraphRule extends BaseBlockRule {
+  
+  constructor() {
+    super(RULE_PRIORITIES.PARAGRAPH);
+  }
   match(line: string, ctx: ParsingContext): boolean {
     // 空行不匹配段落规则
     if (line.trim().length === 0) {
@@ -66,7 +68,10 @@ export class ParagraphRule implements BlockRule {
   }
 
     // 添加文本内容
-    tokens.push(new Token({ type: TokenType.TEXT, content: line.replace(/\n+$/g, '') }));
+    // tokens.push(new Token({ type: TokenType.TEXT, content: line.replace(/\n+$/g, '') }));
+    // 就进行内联处理
+    const inlineParser = this.parseInlineContent(line.replace(/\n+$/g, ''));
+    tokens.push(...inlineParser);
 
     return tokens;
   }

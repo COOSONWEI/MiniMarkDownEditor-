@@ -16,6 +16,8 @@ export enum LexerState {
     IN_LINK = 'IN_LINK'
 }
 
+// TODO: 解决多tokens嵌套问题
+
 export class InlineParser {
     private rules: InlineRule[] = [];   // lexer状态
     public static buffer: string[] = [];  // 文本流
@@ -61,9 +63,9 @@ export class InlineParser {
             }
             if (!isSpecial) {
                 InlineParser.buffer.push(text[InlineParser.position]);
-                if (InlineParser.getCurrentState() !== LexerState.DEFAULT) {
-                    InlineParser.state.push(LexerState.DEFAULT);
-                }
+                // if (InlineParser.getCurrentState() !== LexerState.DEFAULT) {
+                //     InlineParser.state.push(LexerState.DEFAULT);
+                // }
                 InlineParser.position++;
             }
         }
@@ -84,6 +86,9 @@ export class InlineParser {
     }
 
     private solveRestState(): void {
+        while (InlineParser.state.length > 0 && InlineParser.state[InlineParser.state.length - 1] !== LexerState.DEFAULT) {
+            InlineParser.state.pop();
+          }
         for (let i = InlineParser.state.length - 1; i >= 0; i--) {
             if (InlineParser.state[i] === LexerState.DEFAULT) {
                 InlineParser.state.splice(i, 1);

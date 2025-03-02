@@ -60,6 +60,12 @@ describe('MarkdownParser', () => {
   test('表格解析', () => {
     const mdContent = readMdFile('table.md');
     const tokens = parser.parse(mdContent);
-    console.log('table tokens:', tokens);
+    // console.log('table tokens:', tokens);
+  })
+
+  test('文本样式', () => {
+    const mdContent = readMdFile('inlineTest.md');
+    const tokens = parser.parse(mdContent);
+    console.log('text style tokens:', tokens);
   })
 });
