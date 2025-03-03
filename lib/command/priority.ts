@@ -12,6 +12,7 @@ export const RULE_PRIORITIES = {
     BLOCKQUOTE: 12,
     TABLE: 20,
     // 内联元素
+    ESCAPE: 1000, // 转义字符优先级最高
     DEL: 25,
     EM: 26,
     STRONG: 26,

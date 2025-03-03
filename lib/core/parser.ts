@@ -14,6 +14,7 @@ import {InlineParser} from "../parser/inline";
 import {StrongRule} from "../parser/inline/rules/strong";
 import {EmRule} from "../parser/inline/rules/em";
 import {DelRule} from "../parser/inline/rules/del";
+import {EscapeRule} from "../parser/inline/rules/escape";
 /**
  * 解析器基础类
  *
@@ -39,6 +40,7 @@ export class MarkdownParser {
         this.blockParser.registerRule(new TableRule());
         this.blockParser.registerRule(new ParagraphRule());
 
+        this.inlineParser.registerRule(new EscapeRule()); // 注册转义规则，必须放在最前面
         this.inlineParser.registerRule(new StrongRule());
         this.inlineParser.registerRule(new EmRule());
         this.inlineParser.registerRule(new DelRule());
@@ -61,15 +63,15 @@ export class MarkdownParser {
 
         const tokens = this.blockParser.parseLine(line, this.context);
         // 解析行中的内联内容
-        // tokens.map((token) => {
-        //     if (token.type === TokenType.TEXT) {
-        //         console.log('inline token content', token.content);
-        //         token.children = this.inlineParser.parseInline(token.content ?? '');
-        //         console.log('inline token after', token);
-        //         console.log('inline Children token after', token.children);
-        //     }
-        //     return token;
-        // });
+        tokens.map((token) => {
+            if (token.type === TokenType.TEXT) {
+                console.log('inline token content', token.content);
+                token.children = this.inlineParser.parseInline(token.content ?? '');
+                console.log('inline token after', token);
+                console.log('inline Children token after', token.children);
+            }
+            return token;
+        });
         
         // 调试输出
         if (this.debug) {

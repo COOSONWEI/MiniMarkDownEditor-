@@ -60,7 +60,7 @@ export class ListRule extends BaseBlockRule {
                         tag: isOrdered ? 'ol' : 'ul',
                         nesting: -1,
                         block: true,
-                        level: currentLevel
+                        level: ctx.currentListLevel
                     })
                 );
             }

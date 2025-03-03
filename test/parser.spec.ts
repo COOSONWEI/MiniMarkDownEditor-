@@ -95,6 +95,6 @@ describe('MarkdownParser', () => {
   test('非token间嵌套加粗解析', () => {
     const input = readMdFile('inlineTest.md');
     const tokens = parser.parse(input);
-    console.log(input, ' token is', tokens);
+    console.log(input, ' inline token is', tokens);
 })
 });

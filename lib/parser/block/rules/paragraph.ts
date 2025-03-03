@@ -58,12 +58,12 @@ export class ParagraphRule extends BaseBlockRule {
   }
 
     // 添加文本内容
-    // tokens.push(new Token({ type: TokenType.TEXT, content: line.replace(/\n+$/g, '') }));
+    tokens.push(new Token({ type: TokenType.TEXT, content: line.replace(/\n+$/g, '') }));
     // 就进行内联处理
-     const inlineTokens = new InlineTokenizer().tokenize(line);
-     console.log('正在处理文本中的内容');
-    tokens.push(...inlineTokens);
-    console.log('文本处理完毕', inlineTokens);
+    //  const inlineTokens = new InlineTokenizer().tokenize(line);
+    //  console.log('正在处理文本中的内容');
+    // tokens.push(...inlineTokens);
+    // console.log('文本处理完毕', inlineTokens);
     return tokens;
   }
 }

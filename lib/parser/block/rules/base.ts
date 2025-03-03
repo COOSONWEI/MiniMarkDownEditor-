@@ -10,6 +10,7 @@ import { BlockRule } from "../state";
 import {StrongRule} from "../../inline/rules/strong";
 import { EmRule } from "../../inline/rules/em";
 import { DelRule } from "../../inline/rules/del";
+import { EscapeRule } from "../../inline/rules/escape";
 
 export abstract class BaseBlockRule extends BlockRule {
     protected constructor(priority: number) {
@@ -20,13 +21,13 @@ export abstract class BaseBlockRule extends BlockRule {
     // 内联解析
     public parseInlineContent(text: string): Token[] {
         
-      // if (!this.inlineParser) {
-      //   this.inlineParser = new InlineParser();
-      //   this.inlineParser.registerRule(new StrongRule());
-      //   this.inlineParser.registerRule(new EmRule());
-      //   this.inlineParser.registerRule(new DelRule());
-      // }
-      // return this.inlineParser.parseInline(text);
-      return [new Token({ type: TokenType.INLINE, content: text, children: [new Token({type: TokenType.TEXT, content: text})]})];
+      if (!this.inlineParser) {
+        this.inlineParser = new InlineParser();
+        this.inlineParser.registerRule(new EscapeRule()); // 注册转义规则，必须放在最前面
+        this.inlineParser.registerRule(new StrongRule());
+        this.inlineParser.registerRule(new EmRule());
+        this.inlineParser.registerRule(new DelRule());
+      }
+      return this.inlineParser.parseInline(text);
     }
   }

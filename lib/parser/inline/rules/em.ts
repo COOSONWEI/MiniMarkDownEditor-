@@ -4,7 +4,7 @@ import {InlineParser, LexerState} from "../index";
 import { RULE_PRIORITIES } from "../../../command/priority";
 
 /**
- * 删除线规则
+ * 斜体规则
  * @Author simms
  */
 export class EmRule extends InlineRule {
@@ -12,7 +12,12 @@ export class EmRule extends InlineRule {
     state = LexerState.IN_EM;
 
     match(text: string, tokens: Token[], position: number): boolean {
-        return text[position] === '*';
+        // 检查是否是单个星号，并且不是转义字符
+        if (position > 0 && text[position - 1] === '\\') {
+            return false; // 转义字符，不匹配
+        }
+        // 确保不是两个连续的星号（那是加粗语法）
+        return text[position] === '*' && (position + 1 >= text.length || text[position + 1] !== '*');
     }
 
     execute(text: string, tokens: Token[], position: number): void {
@@ -27,10 +32,11 @@ export class EmRule extends InlineRule {
             parserState.travelState(LexerState.IN_EM);
             tokens.push(this.createNewToken(-1, start, start + 1));
         } else {
+            // 确保在打开新标签前刷新文本缓冲区
+            parserState.flushTextBuffer();
             parserState.pushState(LexerState.IN_EM);
             tokens.push(this.createNewToken(1, start, start + 1));
         }
-        
     }
 
     createNewToken(nesting: 1 | 0 | -1, start: number, end: number) {
@@ -38,7 +44,8 @@ export class EmRule extends InlineRule {
             type: nesting === -1 ? TokenType.EM_CLOSE : TokenType.EM_OPEN,
             nesting: nesting,
             map: [start, end],
-            content: "*"
+            content: "*",
+            tag: 'em'
         });
     }
 }
