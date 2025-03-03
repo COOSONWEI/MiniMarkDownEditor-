@@ -1,0 +1,28 @@
+# 源代码控制
+.git
+.gitignore
+
+# 开发环境
+node_modules
+.vscode
+.idea
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 测试文件
+__tests__
+*.spec.ts
+*.test.ts
+test
+coverage
+
+# 构建过程文件
+tsconfig.tsbuildinfo
+
+# 其他不需要发布的文件
+.DS_Store
+.env
+.env.*
+*.tgz

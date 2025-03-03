@@ -223,6 +223,17 @@ export class ParsingContext {
     this.setInParagraph(false);
     this.setListActive(false);
     this.setHeadingActive(false);
-    // 可扩展其他需要重置的状态
+    this.setInTable(false);
+    
+    // 重置引用状态
+    this.currentState.inBlockquote = false;
+    this.currentState.quoteLevelStack = [];
+    
+    // 重置列表层级
+    this.currentState.listLevelStack = [];
+    
+    // 重置当前行索引
+    this.currentLine = 0;
+    this.indentLevel = 0;
   }
 }

@@ -1,0 +1,47 @@
+{
+  "name": "mini-markdown-parser",
+  "version": "1.0.0",
+  "description": "一个轻量级的Markdown解析和渲染库",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "rimraf dist && rollup -c",
+    "test": "jest",
+    "prepublishOnly": "npm run build && npm run test"
+  },
+  "keywords": [
+    "markdown",
+    "parser",
+    "renderer",
+    "lightweight"
+  ],
+  "author": "COOSONWEI",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/mini-markdown-parser"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/mini-markdown-parser/issues"
+  },
+  "homepage": "https://github.com/yourusername/mini-markdown-parser#readme",
+  "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "jest": "^29.7.0",
+    "rimraf": "^5.0.5",
+    "rollup": "^4.9.6",
+    "rollup-plugin-typescript2": "^0.36.0",
+    "ts-jest": "^29.2.5",
+    "typescript": "~5.6.2"
+  },
+  "peerDependencies": {
+    "typescript": ">=4.0.0"
+  }
+}
