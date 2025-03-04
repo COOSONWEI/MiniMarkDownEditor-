@@ -97,8 +97,9 @@ describe('MarkdownParser', () => {
   test('表格解析', () => {
     const mdContent = readMdFile('table.md');
     const tokens = parser.parse(mdContent);
+    const renderResult = render.render(tokens);
     console.log('table tokens:', tokens);
-    
+    console.log('Table renderResult \n ', renderResult);
   })
 
   //   test('非token间嵌套加粗解析', () => {

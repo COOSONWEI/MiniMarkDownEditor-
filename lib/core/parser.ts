@@ -15,6 +15,7 @@ import {StrongRule} from "../parser/inline/rules/strong";
 import {EmRule} from "../parser/inline/rules/em";
 import {DelRule} from "../parser/inline/rules/del";
 import {EscapeRule} from "../parser/inline/rules/escape";
+import { TextRule } from '../parser/inline/rules/text';
 /**
  * 解析器基础类
  *
@@ -40,10 +41,11 @@ export class MarkdownParser {
         this.blockParser.registerRule(new TableRule());
         this.blockParser.registerRule(new ParagraphRule());
 
-        this.inlineParser.registerRule(new EscapeRule()); // 注册转义规则，必须放在最前面
+        this.inlineParser.registerRule(new EscapeRule()); 
         this.inlineParser.registerRule(new StrongRule());
         this.inlineParser.registerRule(new EmRule());
         this.inlineParser.registerRule(new DelRule());
+        this.inlineParser.registerRule(new TextRule());
     }
 
     parse(markdown: string): Token[] {

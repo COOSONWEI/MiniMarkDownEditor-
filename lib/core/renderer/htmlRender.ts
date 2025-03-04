@@ -60,11 +60,11 @@ export class HtmlRenderer extends BaseRenderer {
 
     // 列表规则
     this.registerRule(TokenType.LIST_OPEN, (token) => {
-      const isOrdered = token.info === 'ordered';
+      const isOrdered = token.tag === 'ol';
       return isOrdered ? '<ol>\n' : '<ul>\n';
     });
     this.registerRule(TokenType.LIST_CLOSE, (token) => {
-      const isOrdered = token.info === 'ordered';
+      const isOrdered = token.tag === 'ol';
       return isOrdered ? '</ol>\n' : '</ul>\n';
     });
     this.registerRule(TokenType.LIST_ITEM_OPEN, () => '<li>');
@@ -87,12 +87,12 @@ export class HtmlRenderer extends BaseRenderer {
     this.registerRule(TokenType.TABLE_ROW_OPEN, () => '<tr>\n');
     this.registerRule(TokenType.TABLE_ROW_CLOSE, () => '</tr>\n');
     this.registerRule(TokenType.TABLE_CELL_OPEN, (token) => {
-      const isHeader = token.info === 'header';
+      const isHeader = token.tag === 'th';
       const tag = isHeader ? 'th' : 'td';
       return `<${tag}${this.renderAttrs(token)}>`;
     });
     this.registerRule(TokenType.TABLE_CELL_CLOSE, (token) => {
-      const isHeader = token.info === 'header';
+      const isHeader = token.tag === 'th';
       const tag = isHeader ? 'th' : 'td';
       return `</${tag}>\n`;
     });
