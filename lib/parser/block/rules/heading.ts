@@ -26,11 +26,25 @@ export class HeadingRule extends BaseBlockRule {
     }
 
     execute(line: string, ctx: ParsingContext): Token[] {
+        const trimmedLine = line.trim();
+       
         const match = line.match(HeadingRule.regex)!;
         const level = Math.min(match[1].length, 6); // 最小就是 h6
         ctx.setInParagraph(false);
         ctx.setListActive(false);
         ctx.setHeadingActive(true);
+
+        // if (trimmedLine.length === 0 && ctx.isHeadingActive) {
+        //     ctx.setHeadingActive(false);
+        //     return [
+        //         new Token({
+        //             type: `heading_close`,
+        //             tag: `h${level}`,
+        //             nesting: -1,
+        //             block: true
+        //         })
+        //     ];
+        // }
 
         return [
             new Token({

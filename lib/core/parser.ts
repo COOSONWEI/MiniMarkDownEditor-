@@ -55,6 +55,16 @@ export class MarkdownParser {
             tokens.push(...this.parseLine(line));
         }
 
+        // 处理未闭合的段落
+        if (this.context.isInParagraph) {
+            tokens.push(new Token({
+                type: TokenType.PARAGRAPH_CLOSE,
+                tag: 'p',
+                nesting: -1,
+                block: true,
+            }));
+        }
+
         return tokens;
     }
 
@@ -63,14 +73,16 @@ export class MarkdownParser {
 
         const tokens = this.blockParser.parseLine(line, this.context);
         // 解析行中的内联内容
-        tokens.map((token) => {
-            if (token.type === TokenType.TEXT) {
-                console.log('inline token content', token.content);
+        tokens.forEach((token) => {
+            if (token.type === TokenType.INLINE) {
+                // console.log('inline token content', token.content);
                 token.children = this.inlineParser.parseInline(token.content ?? '');
-                console.log('inline token after', token);
-                console.log('inline Children token after', token.children);
+                // console.log('inline token after', token);
+                // console.log('inline Children token after', token.children);
             }
-            return token;
+            if(token.type === TokenType.TEXT){
+                // token.children = this.inlineParser.parseInline(token.content ?? '');
+            }
         });
         
         // 调试输出

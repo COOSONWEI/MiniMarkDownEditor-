@@ -32,6 +32,9 @@ export class ListRule extends BaseBlockRule {
 
     execute(line: string, ctx: ParsingContext): Token[] {
         const tokens: Token[] = [];
+        const trimmedLine = line.trim();
+        
+      
         let match: RegExpMatchArray | null;
         let indent: number;
         let isOrdered: boolean;
@@ -48,6 +51,21 @@ export class ListRule extends BaseBlockRule {
 
         const content = match[3];
         const currentLevel = ctx.currentListLevel;
+        ctx.setListActive(true)
+
+       
+        if (trimmedLine.length === 0 && ctx.isListActive) {
+            ctx.setListActive(false);
+            tokens.push(
+                new Token({
+                type: TokenType.LIST_CLOSE,
+                tag: isOrdered ? 'ol' : 'ul',
+                nesting: -1,
+                block: true,
+                  level: ctx.currentListLevel
+            }));
+            return tokens;
+        }
 
         // 处理列表层级变化，确保不会超过最大层级
         if (currentLevel > 0) {

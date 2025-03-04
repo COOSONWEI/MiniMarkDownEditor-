@@ -92,6 +92,7 @@ export class ParsingContext {
           this.currentState.tableRowCount = 0;
           this.currentState.tableStartIndex = null;
       }
+      this.pushState('table');
   }
 
   // 获取当前列表层级
@@ -105,6 +106,9 @@ export class ParsingContext {
       return stack.length > 0 ? stack[stack.length - 1] : 0;
   }
 
+  resetListLevel() {
+      this.currentState.listLevelStack = [];
+  }
   // 进入新的列表层级
   enterListLevel(indent: number) {
       if (this.currentState.listLevelStack.length >= 5) {
@@ -112,6 +116,9 @@ export class ParsingContext {
       }
       this.currentState.listActive = true;
       this.currentState.listLevelStack.push(indent);
+      if(!this.currentState.listActive) {
+          this.setListActive(true)
+      }
   }
 
   // 退出当前列表层级
@@ -142,28 +149,34 @@ export class ParsingContext {
           listLevelStack: [...this.currentState.listLevelStack],
           quoteLevelStack: [...this.currentState.quoteLevelStack]
       });
+      
   }
 
-  // 状态栈出栈
   popState() {
       if (this._stateStack.length > 1) {
           this._stateStack.pop();
       }
   }
+  // 设置 hr 状态
 
   // 设置 listActive 状态
   setListActive(value: boolean) {
       this.currentState.listActive = value;
+      if(value === true) {
+        this.pushState('list');
+      }
   }
 
   // 设置 inParagraph 状态
   setInParagraph(value: boolean) {
       this.currentState.inParagraph = value;
+      this.pushState('paragraph');
   }
 
   // 设置 headingActive 状态
   setHeadingActive(value: boolean) {
       this.currentState.headingActive = value;
+      this.pushState('heading');
   }
 
   // 设置表格列对齐方式
@@ -198,6 +211,8 @@ export class ParsingContext {
   // 引用层级管理
   enterQuoteLevel() {
       this.currentState.quoteLevelStack.push(1);
+      this.currentState.inBlockquote = true;
+      this.pushState('blockquote');
   }
 
   leaveQuoteLevel() {
@@ -235,5 +250,23 @@ export class ParsingContext {
     // 重置当前行索引
     this.currentLine = 0;
     this.indentLevel = 0;
+  }
+
+  private _stateHistory: Array<typeof this.currentState> = [];
+
+  // 推送当前状态到历史记录
+  pushCurrentStateToHistory() {
+    this._stateHistory.push({...this._stateStack[this._stateStack.length - 1]});
+  }
+
+  // 获取前一个状态
+  getPreviousState() {
+    if (this._stateStack.length > 0){
+        const thisStack = this._stateStack;
+        return this._stateStack[this._stateStack.length - 1];
+    } else {
+        return null;
+    }
+    console.log('this._stateHistory: ', this._stateHistory);
   }
 }

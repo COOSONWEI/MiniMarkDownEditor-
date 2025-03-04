@@ -11,12 +11,13 @@ import {StrongRule} from "../../inline/rules/strong";
 import { EmRule } from "../../inline/rules/em";
 import { DelRule } from "../../inline/rules/del";
 import { EscapeRule } from "../../inline/rules/escape";
+import { TextRule } from "../../inline/rules/text";
 
 export abstract class BaseBlockRule extends BlockRule {
     protected constructor(priority: number) {
       super({ priority });
     }
-    protected  inlineParser: InlineParser;
+    protected  inlineParser: InlineParser = new InlineParser();
 
     // 内联解析
     public parseInlineContent(text: string): Token[] {
@@ -27,6 +28,7 @@ export abstract class BaseBlockRule extends BlockRule {
         this.inlineParser.registerRule(new StrongRule());
         this.inlineParser.registerRule(new EmRule());
         this.inlineParser.registerRule(new DelRule());
+        this.inlineParser.registerRule(new TextRule());
       }
       return this.inlineParser.parseInline(text);
     }

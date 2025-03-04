@@ -19,26 +19,25 @@ export class TableRule extends BaseBlockRule {
     }
 
     match(line: string, ctx: ParsingContext): boolean {
-        // const lines = ctx.getLines();
-        // const index = ctx.getCurrentLineIndex();
-        // const currentLine = line;
         const nextLine = ctx.getLines()[ctx.getCurrentLineIndex() + 1];
 
+        // 如果已经在表格中，继续匹配表格数据行
         if (ctx.isInTable) {
             return this.TABLE_DATA_REGEX.test(line);
         }
 
-
+        // 检查是否是表格开始
         const isTableStart = this.TABLE_REGEX.test(line);
-        console.log('TableRule match:', isTableStart, nextLine);
         if (!isTableStart) return false;
 
         // 检查下一行是否为分隔符行
         if (nextLine && this.isSeparatorLine(nextLine)) {
             return true;
         }
+        
+        // 避免与列表规则冲突
         if (line.match(/^ *[-*]/)) return false;
-        // return false;
+        
         return this.TABLE_REGEX.test(line.trim());
     }
 
@@ -65,17 +64,12 @@ export class TableRule extends BaseBlockRule {
      * @returns 
      */
     private escapedSplit(str: string): string[] {
-        return str.split(/\\\|/g).flatMap((part, index) => {
-            const cells = part.split(/\|/g);
-            return cells.slice(1, -1).map(cell => cell.trim());
-        });
-        // return str.replace(/\\|/g, '|').split(/\|/).slice(1, -1).map(cell => cell.trim());
-        // // 处理转义竖线
-        // const normalizedStr = str.replace(/\\|/g, '|');
-        // // 分割单元格并过滤空字符串
-        // const cells = normalizedStr.split(/\|/).slice(1, -1);
-        // // 去除每个单元格的前后空格，并压缩中间空格
-        // return cells.map(cell => cell.trim().replace(/\s+/g, ' '));
+        // 处理转义竖线
+        const normalizedStr = str.replace(/\\\|/g, '\u0001'); // 临时替换转义的竖线
+        // 分割单元格并过滤空字符串
+        const cells = normalizedStr.split('|').slice(1, -1);
+        // 去除每个单元格的前后空格，并还原转义的竖线
+        return cells.map(cell => cell.trim().replace(/\u0001/g, '|'));
     }
 
 
@@ -87,7 +81,6 @@ export class TableRule extends BaseBlockRule {
             const nextLine = ctx.getLines()[ctx.getCurrentLineIndex() + 1];
             if (nextLine && this.isSeparatorLine(nextLine)) {
                 // 开始新表格
-
                 const alignments = this.processSeparator(nextLine);
                 ctx.setTableAlignments(alignments);
                 console.log('执行了表格处理', ctx.getLines(), ctx.getLines().length)
@@ -118,7 +111,7 @@ export class TableRule extends BaseBlockRule {
                     new Token({ type: TokenType.TABLE_BODY_CLOSE, tag: 'tbody', nesting: -1 }),
                     new Token({ type: TokenType.TABLE_CLOSE, tag: 'table', nesting: -1 })
                 );
-                ctx.setInTable(false);
+                ctx.setInTable(true);
                 ctx.setTableAlignments([]);
                 // tokens[0].nesting = 1;
                 // tokens[1].nesting = 1;

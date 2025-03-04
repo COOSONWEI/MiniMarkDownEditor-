@@ -11,7 +11,7 @@ export class HorizontalRule extends BaseBlockRule {
     }
 
     match(line: string, ctx: ParsingContext): boolean {
-        return HorizontalRule.regex.test(line.trim()) 
+        return HorizontalRule.regex.test(line.trim());
     }
 
     execute(line: string, ctx: ParsingContext): Token[] {
@@ -19,6 +19,7 @@ export class HorizontalRule extends BaseBlockRule {
         ctx.setInParagraph(false);
         ctx.setListActive(false);
         ctx.setHeadingActive(false);
+        
 
         return [
             new Token({

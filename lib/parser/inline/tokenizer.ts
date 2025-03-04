@@ -10,7 +10,12 @@ import { Token, TokenType } from "../../tokens/token";
 import { InlineContext, InlineState } from "./state";
 
 export class InlineTokenizer {
-    private ctx: InlineContext;
+    private ctx: InlineContext = {
+      pos: 0,
+      state: InlineState.TEXT,
+      buffer: '',
+      tokens: []
+    };
   
     constructor() {
       this.resetContext();

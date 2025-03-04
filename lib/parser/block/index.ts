@@ -111,7 +111,7 @@ function renderClosingTag(token: Token): string {
   return `</${token.tag}>`;
 }
 
-// 示例使用
+// 演示实例
 const sampleTokens: Token[] = [
   new Token({ type: TokenType.PARAGRAPH_OPEN, tag: 'p' }),
   new Token({ type: TokenType.TEXT, content: 'Hello World' }),

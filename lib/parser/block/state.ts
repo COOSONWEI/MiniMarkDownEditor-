@@ -56,13 +56,13 @@ export class BlockParser {
       if (rule.match(line, ctx)) {
         console.log(`执行的规则是: ${rule.constructor.name}`);
         const tokens = rule.execute(line, ctx);
-
-        // 处理空行的特殊情况
-        if (tokens.length === 0 && event === ParserEvent.EMPTY_LINE) {
-          ctx.setInParagraph(false);
-          ctx.setListActive(false);
-          ctx.setHeadingActive(false);
-        }
+        
+        // // 处理空行的特殊情况
+        // if (tokens.length === 0 && event === ParserEvent.EMPTY_LINE) {
+        //   ctx.setInParagraph(false);
+        //   ctx.setListActive(false);
+        //   ctx.setHeadingActive(false);
+        // }
 
         return tokens;
       }
@@ -77,7 +77,7 @@ export class BlockParser {
     if (line.includes('|') && !line.match(/^ *[-*]/)) {
       return ParserEvent.TABLE_MARKER;
     }
-    if (line.match(/^[\-\*\+]\s/)) {
+    if (line.match(/^\s*[\-\*\+]\s/)) {
       return ParserEvent.LIST_MARKER;
     }
     if (line.startsWith('>')) return ParserEvent.QUOTE_MARKER;

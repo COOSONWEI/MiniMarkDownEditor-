@@ -18,4 +18,5 @@ export const RULE_PRIORITIES = {
     STRONG: 26,
     IMAGE: 24,
     LINK: 24,
+    TEXT: 5,
 }

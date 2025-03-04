@@ -26,17 +26,17 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/mini-markdown-parser"
+    "url": "git+https://github.com/COOSONWEI/MiniMarkDownEditor-.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/mini-markdown-parser/issues"
+    "url": "https://github.com/COOSONWEI/MiniMarkDownEditor-/issues"
   },
-  "homepage": "https://github.com/yourusername/mini-markdown-parser#readme",
+  "homepage": "https://github.com/COOSONWEI/MiniMarkDownEditor-#readme",
   "devDependencies": {
     "@types/jest": "^29.5.14",
     "jest": "^29.7.0",
     "rimraf": "^5.0.5",
-    "rollup": "^4.9.6",
+    "rollup": "^4.34.9",
     "rollup-plugin-typescript2": "^0.36.0",
     "ts-jest": "^29.2.5",
     "typescript": "~5.6.2"

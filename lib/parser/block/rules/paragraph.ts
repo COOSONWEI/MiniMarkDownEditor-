@@ -34,7 +34,7 @@ export class ParagraphRule extends BaseBlockRule {
     const tokens: Token[] = [];
     const trimmedLine = line.trim();
     
-      // 如果当前处于段落中且遇到空行，则关闭段落
+   // 如果当前处于段落中且遇到空行，则关闭段落
   if (trimmedLine.length === 0 && ctx.isInParagraph) {
     ctx.setInParagraph(false);
     tokens.push(new Token({
@@ -43,7 +43,7 @@ export class ParagraphRule extends BaseBlockRule {
       nesting: -1,
       block: true,
     }));
-    return tokens;
+    return tokens;   
   }
 
      // 如果不在段落中，则开启新段落
@@ -58,12 +58,13 @@ export class ParagraphRule extends BaseBlockRule {
   }
 
     // 添加文本内容
-    tokens.push(new Token({ type: TokenType.TEXT, content: line.replace(/\n+$/g, '') }));
+    // tokens.push(new Token({ type: TokenType.TEXT, content: line.replace(/\n+$/g, '') }));
     // 就进行内联处理
     //  const inlineTokens = new InlineTokenizer().tokenize(line);
-    //  console.log('正在处理文本中的内容');
-    // tokens.push(...inlineTokens);
-    // console.log('文本处理完毕', inlineTokens);
+     const inlineTokens = this.parseInlineContent(line);
+     console.log('正在处理文本中的内容');
+    tokens.push(...inlineTokens);
+    console.log('文本处理完毕', inlineTokens);
     return tokens;
   }
 }

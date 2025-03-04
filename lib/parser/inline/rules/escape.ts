@@ -25,7 +25,17 @@ export class EscapeRule extends InlineRule {
         
         // 将被转义的字符作为普通文本添加到缓冲区
         if (position + 1 < text.length) {
-            parserState.addToBuffer(text[position + 1]);
+            // 支持转义的特殊字符列表
+            const specialChars = ['*', '_', '~', '`', '\\', '[', ']', '(', ')', '#', '+', '-', '.', '!', '|'];
+            const nextChar = text[position + 1];
+            
+            // 只有特殊字符才需要转义，其他字符保持原样
+            if (specialChars.includes(nextChar)) {
+                parserState.addToBuffer(nextChar);
+            } else {
+                // 如果不是特殊字符，保留原始的转义符和字符
+                parserState.addToBuffer('\\' + nextChar);
+            }
             parserState.advance(1);
         }
     }

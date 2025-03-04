@@ -27,7 +27,6 @@ export class BlockQuoteRule extends BaseBlockRule {
 
         // 重置段落状态
         ctx.setInParagraph(false);
-
         const tokens: Token[] = [];
 
         // 处理层级嵌套

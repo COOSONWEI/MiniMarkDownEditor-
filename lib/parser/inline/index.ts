@@ -72,6 +72,10 @@ export class InlineParser {
      * @returns 分析后的Token数组
      */
     private lexer(text: string): Token[] {
+        console.log(
+            '当前处理的 text 为',
+            text
+        );
         while (this.parserState.getPosition() < text.length) {
             let isSpecial = false;
             for (const rule of this.rules) {
@@ -88,8 +92,12 @@ export class InlineParser {
             }
         }
         
+        // 在处理未闭合状态前，确保刷新缓冲区中的剩余文本
+        this.parserState.flushTextBuffer();
+        
         // 处理未闭合的状态
         this.parserState.solveRestState();
+        console.log('获取的 Token 为: ', this.parserState.getTokens());
         return this.parserState.getTokens();
     }
 

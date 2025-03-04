@@ -9,7 +9,7 @@ import {LexerState} from "./index";
  */
 export abstract class InlineRule {
   priority: number = 0;
-  state: LexerState;
+  state: LexerState = LexerState.DEFAULT;
   private parser: any; // InlineParser实例
 
   /**
