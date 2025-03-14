@@ -5,7 +5,8 @@ import { ParserState, ParserEvent } from "./state";
 export class FSM {
     transitions: { [state: string]: { [event: string]: string } } = {};
     private currentState: string;
-
+    private transitionHistory: Array<{from: string, to: string, event: string}> = [];
+    private maxHistoryLength = 100; // 限制历史记录长度，防止内存泄漏
 
     constructor(initialState: string) {
         this.currentState = initialState;
@@ -100,8 +101,19 @@ export class FSM {
       if (context && !this.isValidTransitionWithContext(transition, context)) {
         return false;
       }
+      
+      // 检测循环转换
+      if (this.detectCyclicTransition(this.currentState, transition, event)) {
+        console.warn(`检测到可能的循环状态转换: ${this.currentState} -> ${transition} via ${event}，强制重置状态`);
+        this.reset();
+        return false;
+      }
   
       console.log(`[FSM] Transitioning from ${this.currentState} to ${transition} via event ${event}`);
+      
+      // 记录转换历史
+      this.recordTransition(this.currentState, transition, event);
+      
       this.currentState = transition;
       return true;
   }
@@ -119,6 +131,33 @@ export class FSM {
     return true;
   }
 
+  // 记录状态转换历史
+  private recordTransition(fromState: string, toState: string, event: string) {
+    this.transitionHistory.push({from: fromState, to: toState, event});
+    
+    // 限制历史记录长度
+    if (this.transitionHistory.length > this.maxHistoryLength) {
+      this.transitionHistory.shift();
+    }
+  }
+  
+  // 检测循环状态转换
+  private detectCyclicTransition(fromState: string, toState: string, event: string): boolean {
+    // 如果历史记录中存在相同的转换超过一定次数，则认为可能存在循环
+    const threshold = 5;
+    let count = 0;
+    
+    // 检查最近的历史记录
+    const recentHistory = this.transitionHistory.slice(-10);
+    for (const transition of recentHistory) {
+      if (transition.from === fromState && transition.to === toState && transition.event === event) {
+        count++;
+      }
+    }
+    
+    return count >= threshold;
+  }
+
    // 获取当前状态
    public getState(): string {
     return this.currentState;
@@ -127,6 +166,8 @@ export class FSM {
   // 重置状态机
   public reset() {
     this.currentState = ParserState.INITIAL;
+    this.transitionHistory = [];
+    console.log('[FSM] 状态机已重置');
   }
 
 }

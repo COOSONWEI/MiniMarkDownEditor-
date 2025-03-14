@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">93.75% </span>
+                <span class="strong">92.15% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>45/48</span>
+                <span class='fraction'>47/51</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">70% </span>
+                <span class="strong">44.44% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>7/10</span>
+                <span class='fraction'>4/9</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">93.75% </span>
+                <span class="strong">92.15% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>45/48</span>
+                <span class='fraction'>47/51</span>
             </div>
         
             
@@ -164,7 +164,12 @@
 <a name='L99'></a><a href='#L99'>99</a>
 <a name='L100'></a><a href='#L100'>100</a>
 <a name='L101'></a><a href='#L101'>101</a>
-<a name='L102'></a><a href='#L102'>102</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -181,6 +186,7 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -206,6 +212,7 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -242,8 +249,11 @@
 <span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -282,6 +292,7 @@ import {StrongRule} from "../parser/inline/rules/strong";
 import {EmRule} from "../parser/inline/rules/em";
 import {DelRule} from "../parser/inline/rules/del";
 import {EscapeRule} from "../parser/inline/rules/escape";
+import { TextRule } from '../parser/inline/rules/text';
 /**
  * 解析器基础类
  *
@@ -307,10 +318,11 @@ export class MarkdownParser {
         this.blockParser.registerRule(new TableRule());
         this.blockParser.registerRule(new ParagraphRule());
 &nbsp;
-        this.inlineParser.registerRule(new EscapeRule()); // 注册转义规则，必须放在最前面
+        this.inlineParser.registerRule(new EscapeRule()); 
         this.inlineParser.registerRule(new StrongRule());
         this.inlineParser.registerRule(new EmRule());
         this.inlineParser.registerRule(new DelRule());
+        this.inlineParser.registerRule(new TextRule());
     }
 &nbsp;
     parse(markdown: string): Token[] {
@@ -341,11 +353,14 @@ export class MarkdownParser {
         const tokens = this.blockParser.parseLine(line, this.context);
         // 解析行中的内联内容
         tokens.forEach((token) =&gt; {
-            if (token.type === TokenType.TEXT || token.type === TokenType.INLINE) {
+            <span class="missing-if-branch" title="if path not taken" >I</span>if (token.type === TokenType.INLINE) {
                 // console.log('inline token content', token.content);
-                token.children = this.inlineParser.parseInline(token.content ?? <span class="branch-1 cbranch-no" title="branch not covered" >'')</span>;
+<span class="cstat-no" title="statement not covered" >                token.children = this.inlineParser.parseInline(token.content ?? '');</span>
                 // console.log('inline token after', token);
                 // console.log('inline Children token after', token.children);
+            }
+            if(token.type === TokenType.TEXT){
+                // token.children = this.inlineParser.parseInline(token.content ?? '');
             }
         });
         
@@ -373,7 +388,7 @@ export class MarkdownParser {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-03-03T14:52:59.448Z
+                at 2025-03-04T13:24:13.310Z
             </div>
         <script src="../prettify.js"></script>
         <script>

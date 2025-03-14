@@ -25,7 +25,6 @@ import { TextRule } from '../parser/inline/rules/text';
 export class MarkdownParser {
     private debug: boolean; // 是否开启调试模式
 
-
     private context = new ParsingContext();
     private blockParser = new BlockParser();
     private inlineParser = new InlineParser();
@@ -49,6 +48,9 @@ export class MarkdownParser {
     }
 
     parse(markdown: string): Token[] {
+        // 重置解析上下文，确保每次解析都从完全干净的状态开始
+        this.resetContext();
+        
         const lines = markdown.split('\n');
         const tokens: Token[] = [];
         this.context.setLines(lines); // 添加 lines 到 context   
@@ -67,7 +69,24 @@ export class MarkdownParser {
             }));
         }
 
+        if (this.debug) {
+            console.log('最终生成的tokens:', tokens);
+        }
+
         return tokens;
+    }
+
+    // 重置所有解析状态
+    private resetContext(): void {
+        // 创建全新的上下文，而不是尝试重置现有上下文
+        this.context = new ParsingContext();
+        
+        // 确保内联解析器也被重置
+        this.inlineParser.getParserState().reset();
+        
+        if (this.debug) {
+            console.log('解析器状态已完全重置');
+        }
     }
 
     // 解析行

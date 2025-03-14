@@ -41,8 +41,8 @@ describe('MarkdownParser', () => {
     const tokens = parser.parse(mdContent);
     const renderResult = render.render(tokens);
 
-    console.log('p tokens:', tokens);
-    console.log('P renderResult ', renderResult);
+    // console.log('p tokens:', tokens);
+    // console.log('P renderResult ', renderResult);
      // 验证 Tokens
      expect(tokens).toEqual([
       new Token({ type: TokenType.PARAGRAPH_OPEN, tag: 'p', nesting: 1, block: true }),
@@ -57,7 +57,7 @@ describe('MarkdownParser', () => {
      ]) 
   })
 
-  // 标题测试
+  // // 标题测试
   // test('标题解析', () => {
   //   const mdContent = readMdFile('headings.md');
   //   const tokens = parser.parse(mdContent);
@@ -72,7 +72,7 @@ describe('MarkdownParser', () => {
    
   // })
 
-  // 列表测试
+  // // 列表测试
   // test('列表解析', () => {
   //   const mdContent = readMdFile('list.md');
   //   const tokens = parser.parse(mdContent);
@@ -85,16 +85,14 @@ describe('MarkdownParser', () => {
   //     renderResult
   //   );
   // })
-  // 表格测试
+  // // 表格测试
   // test('表格解析', () => {
   //   const mdContent = readMdFile('table.md');
   //   const tokens = parser.parse(mdContent);
+  //   console.log('table tokens:', tokens);
+  //   const renderResult = render.render(tokens);
+  //   console.log('table renderResult:', renderResult);
   //   // console.log('table tokens:', tokens);
   // })
 
-//   test('非token间嵌套加粗解析', () => {
-//     const input = readMdFile('inlineTest.md');
-//     const tokens = parser.parse(input);
-//     console.log(input, ' inline token is', tokens);
-// })
 });

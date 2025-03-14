@@ -54,8 +54,7 @@ class MyCustomRenderer extends BaseRenderer {
     super();
     // 定义自定义渲染规则
     this.rules = {
-      // 实现特定token的渲染逻辑
-      // ...
+      // 在这里写上自定义渲染逻辑
     };
   }
 }

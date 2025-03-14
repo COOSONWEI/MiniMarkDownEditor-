@@ -1,70 +1,101 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
-import { RendererManager, RendererType } from '../../lib/core/renderer/rendererManager';
-// import { Token } from '../../lib/tokens/token';
-import { MarkdownParser } from '../../lib/core/parser';
+import { ref } from 'vue';
+import { MarkdownParser, RendererManager, RendererType, Token } from "mini-markdown-parser";
 
-// 实例化解析器和渲染器
-const parser = new MarkdownParser();
-const rendererManager = new RendererManager();
-
-// 定义状态
-const markdownText = ref('');
-const htmlPreview = ref('');
-const isEditing = ref(true);
-
-// 监听markdown文本变化，实时更新预览
-watch(markdownText, (newValue) => {
-  updatePreview(newValue);
-});
-
-// 更新预览内容
-function updatePreview(markdown: string) {
-  try {
-    // 解析Markdown文本为Token数组
-    const tokens = parser.parse(markdown);
-    // 使用HTML渲染器渲染Token数组
-    const html = rendererManager.renderWith(RendererType.HTML, tokens);
-    htmlPreview.value = html;
-  } catch (error) {
-    console.error('渲染出错:', error);
-    htmlPreview.value = `<div class="error">渲染错误: ${error}</div>`;
+// 扩展Window接口以支持自定义属性
+declare global {
+  interface Window {
+    _isRendering: boolean;
   }
 }
 
-// 切换编辑/预览模式
-function toggleMode() {
-  isEditing.value = !isEditing.value;
-}
+const markdownInput = ref("# h1 Heading\n## h2 Heading\n### h3 Heading\n#### h4 Heading\n##### h5 Heading\n###### h6 Heading");
+const htmlContent = ref("");
+const previewMode = ref(false);
+const parser = new MarkdownParser();
+const renderer = new RendererManager();
 
-// 组件挂载时初始化
-onMounted(() => {
-  // 可以在这里加载默认内容或从本地存储恢复之前的编辑内容
-  markdownText.value = '# 欢迎使用 Markdown 编辑器\n\n这是一个简单的 Markdown 编辑器示例。\n\n## 功能特点\n\n- 实时预览\n- 支持基本 Markdown 语法\n- 分屏显示';
-  updatePreview(markdownText.value);
-});
+// 移除computed属性，改为手动渲染函数
+const renderMarkdown = () => {
+  try {
+    // 阻止浏览器可能的自动渲染
+    if (window._isRendering) {
+      console.log('已有渲染任务在进行中，跳过');
+      return;
+    }
+    
+    // 设置渲染状态锁
+    window._isRendering = true;
+    
+    console.log('开始渲染，输入内容:', markdownInput.value);
+    console.log('输入内容长度:', markdownInput.value.length);
+    console.log('输入内容中的换行符数量:', (markdownInput.value.match(/\n/g) || []).length);
+    
+    // 记录解析前的状态
+    console.log('解析前状态:', { 
+      inputLength: markdownInput.value.length,
+      inputLines: markdownInput.value.split('\n').length
+    });
+    
+    const tokens = parser.parse(markdownInput.value);
+    console.log('解析后的tokens数量:', tokens.length);
+    console.log('解析后的tokens:', tokens);
+    
+    htmlContent.value = renderer.renderWith(RendererType.HTML, tokens);
+    console.log('渲染成功:', htmlContent.value);
+    
+    // 释放渲染状态锁
+    window._isRendering = false;
+  } catch (error) {
+    console.error('渲染错误:', error);
+    htmlContent.value = `<div class="error">渲染错误: ${error}</div>`;
+    // 确保错误情况下也释放锁
+    window._isRendering = false;
+  }
+};
+
+// 添加自定义窗口渲染状态变量
+// @ts-ignore
+window._isRendering = false;
+
+// 初始渲染一次
+renderMarkdown();
+
+// 添加防抖函数
+const debounce = (fn: Function, delay: number) => {
+  let timer: ReturnType<typeof setTimeout> | null = null;
+  return function(this: any, ...args: any[]) {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(() => {
+      fn.apply(this, args);
+      timer = null;
+    }, delay);
+  };
+};
+
+// 防抖后的渲染函数，用于按钮手动触发时也可以防止连续点击导致问题
+const debouncedRenderMarkdown = debounce(renderMarkdown, 300);
+
+const togglePreviewMode = () => {
+  previewMode.value = !previewMode.value;
+};
 </script>
 
 <template>
-  <div class="markdown-editor">
+  <div class="markdown-editor" :class="{ 'preview-only': previewMode }">
     <div class="toolbar">
-      <h2>Markdown 编辑器</h2>
-      <button @click="toggleMode">{{ isEditing ? '预览模式' : '编辑模式' }}</button>
-    </div>
-    
-    <div class="editor-container" :class="{ 'preview-only': !isEditing }">
-      <!-- 编辑区域 -->
-      <div class="editor" v-show="isEditing">
-        <textarea 
-          v-model="markdownText" 
-          placeholder="在这里输入Markdown文本..."
-          spellcheck="false"
-        ></textarea>
+      <h2>Markdown编辑器</h2>
+      <div class="toolbar-buttons">
+        <button @click="debouncedRenderMarkdown" class="render-btn">渲染</button>
+        <button @click="togglePreviewMode">{{ previewMode ? '编辑模式' : '预览模式' }}</button>
       </div>
-      
-      <!-- 预览区域 -->
-      <div class="preview" :class="{ 'full-width': !isEditing }">
-        <div class="preview-content" v-html="htmlPreview"></div>
+    </div>
+    <div class="editor-container">
+      <div class="editor" :class="{ 'full-width': !previewMode }">
+        <textarea v-model="markdownInput" placeholder="输入Markdown内容..."></textarea>
+      </div>
+      <div class="preview" :class="{ 'full-width': previewMode }">
+        <div class="preview-content" v-html="htmlContent"></div>
       </div>
     </div>
   </div>
@@ -95,6 +126,11 @@ onMounted(() => {
   color: #333;
 }
 
+.toolbar-buttons {
+  display: flex;
+  gap: 10px;
+}
+
 .toolbar button {
   padding: 6px 12px;
   background-color: #4CAF50;
@@ -103,6 +139,14 @@ onMounted(() => {
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.9rem;
+}
+
+.render-btn {
+  background-color: #2196F3;
+}
+
+.render-btn:hover {
+  background-color: #0b7dda;
 }
 
 .toolbar button:hover {

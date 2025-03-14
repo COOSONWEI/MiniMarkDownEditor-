@@ -41,8 +41,8 @@ describe('MarkdownParser', () => {
     const tokens = parser.parse(mdContent);
     const renderResult = render.render(tokens);
 
-    console.log('p tokens:', tokens);
-    console.log('P renderResult ', renderResult);
+    // console.log('p tokens:', tokens);
+    // console.log('P renderResult ', renderResult);
     // 验证 Tokens
     expect(tokens).toEqual([
       new Token({ type: TokenType.PARAGRAPH_OPEN, tag: 'p', nesting: 1, block: true }),
@@ -61,7 +61,9 @@ describe('MarkdownParser', () => {
   test('标题解析', () => {
     const mdContent = readMdFile('headings.md');
     const tokens = parser.parse(mdContent);
-
+    console.log('h tokens:', tokens);
+    // const renderResult = render.render(tokens);
+    // console.log('H renderResult ', renderResult);
     expect(tokens).toEqual([
       // h1
       new Token({ type: TokenType.HEADING_OPEN, tag: 'h1', nesting: 1, block: true }),
@@ -80,20 +82,36 @@ describe('MarkdownParser', () => {
     ]);
   })
 
-  // 列表测试
-  test('列表解析', () => {
-    const mdContent = readMdFile('list.md');
-    const tokens = parser.parse(mdContent);
-    // console.log('list tokens:', tokens);
-    const renderResult = render.render(tokens);
 
-    console.log('List tokens:', tokens);
-    console.log(
-      'List renderResult \n ',
-      renderResult
-    );
-  })
-  // 表格测试
+  test('列表解析测试', () => {
+    const input = '- Item 1\n- Item 2\n\n1. First\n2. Second';
+    const tokens = parser.parse(input);
+
+    // 验证生成的Token数量
+    expect(tokens.length).toBeGreaterThan(0);
+
+    // 验证列表项的Token类型
+    const listItemTokens = tokens.filter(t => t.type === TokenType.LIST_ITEM_OPEN);
+    expect(listItemTokens.length).toBe(4); // 应该有4个列表项
+    const html = render.render(tokens);
+    // console.log('list tokens:', tokens);
+    // console.log('list renderResult \n ', html);
+    // 验证渲染结果
+    expect(html).toContain('<ul>');
+    expect(html).toContain('<ol>');
+    expect(html.match(/<li>/g)!.length).toBe(4); // 应该有4个列表项
+  });
+
+  test('引用块解析测试', () => {
+    const input = readMdFile('quote.md');
+    const tokens = parser.parse(input);
+    // console.log('blockquote tokens:', tokens);
+    const html = render.render(tokens);
+    // console.log('blockquote renderResult \n ', html);
+  });
+  
+
+  // // 表格测试
   test('表格解析', () => {
     const mdContent = readMdFile('table.md');
     const tokens = parser.parse(mdContent);

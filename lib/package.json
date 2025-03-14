@@ -1,9 +1,9 @@
 {
   "name": "mini-markdown-parser",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "一个轻量级的Markdown解析和渲染库",
-  "main": "dist/index.js",
-  "module": "dist/index.esm.js",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
   "files": [
@@ -12,9 +12,12 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "rimraf dist && rollup -c",
     "test": "jest",
-    "prepublishOnly": "npm run build && npm run test"
+    "build": "rimraf dist && rollup -c",
+    "prepublishOnly": "npm run build && npm run test",
+    "dev": "rollup -c -w",
+    "test:newlines": "node test/testNewlines.cjs",
+    "test:loop": "node test/testLoopDetection.cjs"
   },
   "keywords": [
     "markdown",

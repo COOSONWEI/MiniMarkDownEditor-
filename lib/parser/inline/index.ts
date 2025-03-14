@@ -6,7 +6,7 @@ import {InlineRule} from "./state";
 
 /**
  * 加粗规则（待解决多tokens嵌套问题）
- * @Author simms
+ * @author simms
  */
 export enum LexerState {
     DEFAULT = 'DEFAULT',

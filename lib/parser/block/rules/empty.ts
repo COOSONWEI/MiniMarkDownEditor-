@@ -16,13 +16,17 @@ export class EmptyLineRule implements BlockRule {
       return line.trim().length === 0;
     }
     execute(line: string, ctx: ParsingContext): Token[] {
-      // 遇到空行段落自动闭合
-      if (ctx.getPreviousState()?.state === 'paragraph') {
+      console.log('执行空行规则，当前状态:', ctx.currentState);
+      const tokens: Token[] = [];
+      
+      // 处理段落状态
+      if (ctx.isInParagraph) {
         ctx.setInParagraph(false);
-        return [new Token({ type: TokenType.PARAGRAPH_CLOSE, tag: 'p', nesting: -1 , block: true})];
+        tokens.push(new Token({ type: TokenType.PARAGRAPH_CLOSE, tag: 'p', nesting: -1, block: true}));
       }
-      if (ctx.getPreviousState()?.state === 'list') {
-        const tokens = [];
+      
+      // 处理列表状态
+      if (ctx.isListActive) {
         const orderedRegex = /^([ \t]*)(\d+)\.\s+(.*)/;
         while (ctx.currentListLevel > 0) {
           ctx.leaveListLevel();
@@ -36,10 +40,25 @@ export class EmptyLineRule implements BlockRule {
         }
         ctx.setListActive(false);
         ctx.resetListLevel();
-        return tokens;
       }
-      ctx.reset(); // 重置其他状态
-      return [];
-    
+      
+      // 处理标题状态
+      if (ctx.isHeadingActive) {
+        ctx.setHeadingActive(false);
+      }
+      
+      // 处理引用状态
+      if (ctx.isInBlockquote) {
+        ctx.currentState.inBlockquote = false;
+      }
+      
+      // 确保不会重复调用状态重置
+      if (ctx.getPreviousState()?.state !== 'root') {
+        console.log('重置状态');
+        // 避免重复重置，只有在非根状态时才重置
+        ctx.reset();
+      }
+      
+      return tokens;
     }
   }
